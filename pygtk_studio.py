@@ -286,7 +286,7 @@ class GUI_git():
 		
 #Comando GIT CLONE
 	def tog_clone(self, widget, data=None):
-		self.entry1.set_text("git clone https://github.com/belcocco/py.git > clone.out")
+		self.entry1.set_text("git clone https://github.com/belcocco/py0.020.git > clone.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
@@ -307,7 +307,7 @@ class GUI_git():
 		self.entry3.set_text("")
 #Comando GIT PUSH
 	def tog_push(self, widget, data=None):
-		self.entry1.set_text("git push https://github.com/belcocco/py.git > push.out &")
+		self.entry1.set_text("git push https://github.com/belcocco/py0.020.git > push.out &")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
@@ -380,7 +380,7 @@ class GUI_hack:
 		self.vbox.show()
 
 #		self.entry = gtk.Entry(100)
-#		self.entry.set_text("git clone http://github.com/belcocco/py.git")
+#		self.entry.set_text("git clone http://github.com/belcocco/py0.020.git")
 #		self.vbox.pack_start(self.entry, gtk.TRUE, gtk.TRUE, 0)
 #		self.button = gtk.Button(None, gtk.STOCK_EXECUTE)
 #		self.button.connect("clicked", self.changeText)
