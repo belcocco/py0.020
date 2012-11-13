@@ -200,17 +200,33 @@ class GUI_git():
 #		self.vbox = gtk.VBox()
 
 #		self.vbox = gtk.VBox(gtk.TRUE, 3)
-		self.vbox = gtk.VBox(gtk.TRUE, 3)
+		self.vbox = gtk.VBox(gtk.TRUE, 10)
 		self.win.add(self.vbox)
 		self.vbox.show()
+#####################DA CANCELLARE ######################
+#        foto = gtk.Button("Foto")
+#        foto.connect("clicked", self.on_clicked_foto)
+#        foto.set_size_request(100, 40)
+#        fixed.put(foto, 10, 170)
+#########################################################
 
 #ToggleButton per l'attività Clone (con il repo remoto)
 		self.tog_button_clone = gtk.ToggleButton("CLONE")
 		self.tog_button_clone.connect("clicked", self.tog_clone, "Download")
+
+#DIMENSIONE del BOTTONE
+		self.tog_button_clone.set_size_request(100,40)
+		print "DIMENSIONE TOGGLE_BUTTON_CLONE"
+
 		self.vbox.pack_start(self.tog_button_clone, gtk.TRUE, gtk.TRUE, 5)
 #Bottone Add
 		self.button_add = gtk.Button("ADD")
 		self.button_add.connect("clicked", self.tog_add, "Add")
+
+#DIMENSIONE del BOTTONE
+		self.button_add.set_size_request(10,10)
+		print "DIMENSIONE BUTTON_ADD"
+
 		self.vbox.pack_start(self.button_add, gtk.TRUE, gtk.TRUE, 0)
 #Bottone Log
 		self.button_log = gtk.Button("LOG")
@@ -259,34 +275,36 @@ class GUI_git():
 		print proc.returncode
 		str1 = "Cloning into"
 		str2 = "not found: did you run git"
+		strNR = 0		
+		cmdFind = 'find . -name "clone.out" -print'    # find is a standard Unix tool
 		if proc.returncode != 0:
 #			print "fatal: il path di destinazione 'py' esiste già e non è una directory vuota."
 			self.entry3.set_text("fatal: il path di destinazione 'py' esiste già e non è una directory vuota.")
 			self.entry2.set_text("...terminato con ERRORE !")
-		
-		# Guarda nel file clone.out se il testo è != da 'Cloning into 'py'...' c'è stato ERRORE!!!!
-		# Guarda nel file clone.out se il testo è = a 'not found: did you run git update-server-info on the server? c'è stato ERRORE!!!! 
-		cmd = 'find . -name "clone.out" -print'    # find is a standard Unix tool
- 
-		for file in os.popen(cmd).readlines():     # run find command
-			num  = 1
-			name = file[:-1]                       # strip '\n'
-			for line in open(name).readlines():    # scan the file
-				#pos = string.find(line, "\t")
-				pos = string.find(line, str1)		#"Cloning into" o "not found: did you run git"
-				if  pos >= 0:
-					print name			#, num, pos           # report tab found
-					print line[:-1]        # [:-1] strips final \n
-					print '£££', ' '*pos + '*', '\n'
-				num = num+1
-		print "TUTTO OK CON CERCASTRINGA"
 
-#			self.entry2.set_text("...terminato con successo !")
-#			self.entry3.set_text("")
+			# Guarda nel file clone.out se il testo è != da 'Cloning into 'py'...' c'è stato ERRORE!!!!
+			# Guarda nel file clone.out se il testo è = a 'not found: did you run git update-server-info on the server? c'è stato ERRORE!!!! 
+		while strNR == 0:
+			for file in os.popen(cmdFind).readlines():     # run find command
+				print "CICLO FOR"
+				num  = 1
+				name = file[:-1]                       # strip '\n'
+				for line in open(name).readlines():    # scan the file
+							#pos = string.find(line, "\t")
+					pos = string.find(line, str1)		#"Cloning into" o "not found: did you run git"
+					if  pos >= 0:
+						strNR = strNR +1
+#						print name, num, pos, str2	#, num, pos           # report tab found
+#						print '--->', line[:-1]        # [:-1] strips final \n
+#						print '--->', ' '*pos + '*', '\n'
+					num = num+1
+			print "Stringa: ", str1, "TROVATA", strNR, "VOLTE"
+			self.entry2.set_text("...internet assente.")
+			self.entry3.set_text("fatal: HTTP request failed")
 		
 #Comando GIT CLONE
 	def tog_clone(self, widget, data=None):
-		self.entry1.set_text("git clone https://github.com/belcocco/py0.020.git > clone.out")
+		self.entry1.set_text("git clone https://github.com/belcocco/py.git > clone.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
@@ -307,7 +325,7 @@ class GUI_git():
 		self.entry3.set_text("")
 #Comando GIT PUSH
 	def tog_push(self, widget, data=None):
-		self.entry1.set_text("git push https://github.com/belcocco/py0.020.git > push.out &")
+		self.entry1.set_text("git push https://github.com/belcocco/py.git > push.out &")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
@@ -380,7 +398,7 @@ class GUI_hack:
 		self.vbox.show()
 
 #		self.entry = gtk.Entry(100)
-#		self.entry.set_text("git clone http://github.com/belcocco/py0.020.git")
+#		self.entry.set_text("git clone http://github.com/belcocco/py.git")
 #		self.vbox.pack_start(self.entry, gtk.TRUE, gtk.TRUE, 0)
 #		self.button = gtk.Button(None, gtk.STOCK_EXECUTE)
 #		self.button.connect("clicked", self.changeText)
