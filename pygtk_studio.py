@@ -264,7 +264,7 @@ class GUI_git():
 	def exec_git_cmd(self, widget):
 		CMD_git = self.entry1.get_text()
 		print CMD_git
-		self.entry3.set_text("... attendere prego.")   #Se NON si vede è perchè manca '&' alla fine del comando shell
+		self.entry2.set_text("Tutto Fatto.")   #Se NON si vede è perchè manca '&' alla fine del comando shell
 
 		#Esegui comando della shell. Ciò che FUNZIONA MEGLIO. 
 		proc = subprocess.Popen(CMD_git, shell=True) #, stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -273,38 +273,58 @@ class GUI_git():
 		#Controlla se il comando è andato bene. SOLO POPEN
 		proc.wait()
 		print proc.returncode
+		print proc.stdin
+		k = 0
 		str1 = "Cloning into"
 		str2 = "not found: did you run git"
-		strNR = 0		
-		cmdFind = 'find . -name "clone.out" -print'    # find is a standard Unix tool
-		if proc.returncode != 0:
-#			print "fatal: il path di destinazione 'py' esiste già e non è una directory vuota."
-			self.entry3.set_text("fatal: il path di destinazione 'py' esiste già e non è una directory vuota.")
-			self.entry2.set_text("...terminato con ERRORE !")
+		strNR = 0
+		cmdFind = 'find . -name "clone.out" -print'    # Cerca nel file clone.out
 
+		#Guarda se il comando git clone .... ha dato errrori
+		if proc.returncode != 0:
+			#C'E' ERRORE
+			# Guarda se il file clone.out è vuoto 
+			# (allora internet è connessa, ma esiste già la dir del clonaggio)
+			if os.stat("clone.out").st_size == 0:
+				#Errore: il path di destinazione esiste già e non è una directory vuota."
+				self.entry2.set_text("...terminato con ERRORE !")
+				self.entry3.set_text("fatal: il path di destinazione esiste già e non è una directory vuota.")
+			# Il fi
 			# Guarda nel file clone.out se il testo è != da 'Cloning into 'py'...' c'è stato ERRORE!!!!
 			# Guarda nel file clone.out se il testo è = a 'not found: did you run git update-server-info on the server? c'è stato ERRORE!!!! 
-		while strNR == 0:
-			for file in os.popen(cmdFind).readlines():     # run find command
-				print "CICLO FOR"
-				num  = 1
-				name = file[:-1]                       # strip '\n'
-				for line in open(name).readlines():    # scan the file
-							#pos = string.find(line, "\t")
-					pos = string.find(line, str1)		#"Cloning into" o "not found: did you run git"
-					if  pos >= 0:
-						strNR = strNR +1
-#						print name, num, pos, str2	#, num, pos           # report tab found
-#						print '--->', line[:-1]        # [:-1] strips final \n
-#						print '--->', ' '*pos + '*', '\n'
-					num = num+1
-			print "Stringa: ", str1, "TROVATA", strNR, "VOLTE"
-			self.entry2.set_text("...internet assente.")
-			self.entry3.set_text("fatal: HTTP request failed")
+			elif k == 0:
+				for file in os.popen(cmdFind).readlines():     # run find command
+					print "CICLO FOR 2"
+					num  = 1
+					name = file[:-1]                       # strip '\n'
+					for line in open(name).readlines():    # scan the file
+								#pos = string.find(line, "\t")
+						pos = string.find(line, str1)		#"Cloning into" o "not found: did you run git"
+						if  pos >= 0:
+							strNR = strNR +1
+#							print name, num, pos, str2	#, num, pos           # report tab found
+#							print '--->', line[:-1]        # [:-1] strips final \n
+#							print '--->', ' '*pos + '*', '\n'
+						num = num+1
+				print "Stringa: ", str1, "TROVATA", strNR, "VOLTE"
+################
+# ATTENZIONE
+# POTREBBE ESSERE ANCHE L'ERRORE DOVUTO A:
+# fatal: Authenticatin failed
+# PER ERRORE DI USERNAME O PASSWORD O NOME DEL REPOSITORY
+################
+# e' necessario capire l'output del comando git
+################
+
+				self.entry2.set_text("...internet assente.")
+				self.entry3.set_text("fatal: HTTP request failed")
+				k == 1
+			#return
+		
 		
 #Comando GIT CLONE
 	def tog_clone(self, widget, data=None):
-		self.entry1.set_text("git clone https://github.com/belcocco/py.git > clone.out")
+		self.entry1.set_text("git clone https://github.com/belcocco/py0.020.git > clone.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
@@ -325,7 +345,7 @@ class GUI_git():
 		self.entry3.set_text("")
 #Comando GIT PUSH
 	def tog_push(self, widget, data=None):
-		self.entry1.set_text("git push https://github.com/belcocco/py.git > push.out &")
+		self.entry1.set_text("git push https://github.com/belcocco/py0.020.git > push.out &")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
