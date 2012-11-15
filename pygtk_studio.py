@@ -20,7 +20,7 @@
 #import module
 import pygtk, gtk
 pygtk.require('2.0')
-import gtk.glade
+#import gtk.glade
 import os, string, subprocess, sys
 import ftplib
 import gobject
@@ -33,8 +33,8 @@ from threading import Thread
 from Queue import Queue, Empty
 
 #Importa moduli dell'utente
-import outwin	#Finestra d'appoggio per gli input/output
 
+#Finestra principale con tutti i bottoni delle attività
 class MainWin(gtk.Window):
     def __init__(self):
         super(MainWin, self).__init__()
@@ -93,19 +93,20 @@ class MainWin(gtk.Window):
         
     def on_clicked_git(self, widget):
 		#INSERIRE la procedura di apertura della finestra GUI() al click del git-button
-        app = GUI_git()						#si apre la finestra dell'applicazione
+        NameFileOut = ""
+        GUI_git()						#si apre la finestra dell'applicazione
 #       app.show_all()
 #       gtk.main_quit()
 
     def on_clicked_ftp(self, widget):
 		#INSERIRE la procedura di apertura della finestra GUI() al click del ftp-button
-        app = GUI_ftp()						#si apre la finestra dell'applicazione
-        app.show_all()
+        GUI_ftp()						#si apre la finestra dell'applicazione
+#        app.show_all()
 #       gtk.main_quit()
 
     def on_clicked_hack(self, widget):
 		#INSERIRE la procedura di apertura della finestra GUI() al click del hack-button
-        app = GUI_hack()						#si apre la finestra dell'applicazione
+        GUI_hack()						#si apre la finestra dell'applicazione
 #       gtk.main_quit()
 #Da questo punto importa applicazioni fatte da altri
     def on_clicked_lista(self, widget):
@@ -119,7 +120,7 @@ class MainWin(gtk.Window):
     def on_clicked_foto(self, widget):
 		#INSERIRE la procedura di apertura della finestra GUI() al click del git-button
 		print "PRIMA di rinomina_foto"
-		app = GUI_foto()    #import rinomina_foto
+		GUI_foto()    #import rinomina_foto
 		print "DOPO rinomina_foto"
 
     def on_clicked_comando1(self, widget):
@@ -132,12 +133,6 @@ class MainWin(gtk.Window):
         app.Presentazione.show_all()
 
 #		gtk.main_quit()
-
-
-#######################################
-UI_FILE_GIT = "src/pygtk_studio_git.ui"
-UI_FILE_FTP = "src/pygtk_studio_ftp.ui"
-UI_FILE_HACK = "src/pygtk_studio_hack.ui"
 
 class Presentazione:
     def __init__(self):
@@ -166,7 +161,7 @@ class Presentazione:
         hbox.pack_start(vbox2, False, False, 10)
         self.Presentazione.add(hbox)
         self.Presentazione.show_all()
-
+ 
     def immpres(self, widget):				#funzione contenente immagine utilizzata dalla presentazione
         self.immpres  = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.immpres.set_title("Linus")
@@ -175,7 +170,6 @@ class Presentazione:
         img.set_from_file('torvalds-linus.jpeg')
         self.immpres.add(img)
         self.immpres.show_all()
-
     def delete_event(self, widget, event, data=None):
         return gtk.FALSE
     def destroy(self, widget, data=None):
@@ -203,30 +197,14 @@ class GUI_git():
 		self.vbox = gtk.VBox(gtk.TRUE, 10)
 		self.win.add(self.vbox)
 		self.vbox.show()
-#####################DA CANCELLARE ######################
-#        foto = gtk.Button("Foto")
-#        foto.connect("clicked", self.on_clicked_foto)
-#        foto.set_size_request(100, 40)
-#        fixed.put(foto, 10, 170)
-#########################################################
 
 #ToggleButton per l'attività Clone (con il repo remoto)
 		self.tog_button_clone = gtk.ToggleButton("CLONE")
 		self.tog_button_clone.connect("clicked", self.tog_clone, "Download")
-
-#DIMENSIONE del BOTTONE
-		self.tog_button_clone.set_size_request(100,40)
-		print "DIMENSIONE TOGGLE_BUTTON_CLONE"
-
 		self.vbox.pack_start(self.tog_button_clone, gtk.TRUE, gtk.TRUE, 5)
 #Bottone Add
 		self.button_add = gtk.Button("ADD")
 		self.button_add.connect("clicked", self.tog_add, "Add")
-
-#DIMENSIONE del BOTTONE
-		self.button_add.set_size_request(10,10)
-		print "DIMENSIONE BUTTON_ADD"
-
 		self.vbox.pack_start(self.button_add, gtk.TRUE, gtk.TRUE, 0)
 #Bottone Log
 		self.button_log = gtk.Button("LOG")
@@ -273,27 +251,36 @@ class GUI_git():
 		#Controlla se il comando è andato bene. SOLO POPEN
 		proc.wait()
 		print proc.returncode
-		print proc.stdin
 		k = 0
-		str1 = "Cloning into"
-		str2 = "not found: did you run git"
+		str1 = ""		#non viene eseguito nessun ciclo FOR. Basta guardare se il file è VUOTO.
+		str2 = "Cloning into"
+		str3 = "not found: did you run git"
+		str4 = "fatal: HTTP request failed"
+		str5 = "fatal: Authentication failed"
 		strNR = 0
 		cmdFind = 'find . -name "clone.out" -print'    # Cerca nel file clone.out
 
 		#Guarda se il comando git clone .... ha dato errrori
 		if proc.returncode != 0:
-			#C'E' ERRORE
-			# Guarda se il file clone.out è vuoto 
-			# (allora internet è connessa, ma esiste già la dir del clonaggio)
-			if os.stat("clone.out").st_size == 0:
+			Outwin(NameFileOut)	#Visualizzazione della finestra degli errori
+###################### DA CANCELLARE ###########
+#			f = open('clone.out')
+#			lines = f.readlines()
+#			f.close()
+# 			for line in lines:
+#				print line,
+######################
+			#C'E' ERRORE per INTERNET SCONNESSA, ma esiste già la dir del clonaggio?
+			#Guarda se il file clone.out è vuoto 
+			if os.stat(NameFileOut).st_size == 0:
 				#Errore: il path di destinazione esiste già e non è una directory vuota."
 				self.entry2.set_text("...terminato con ERRORE !")
-				self.entry3.set_text("fatal: il path di destinazione esiste già e non è una directory vuota.")
-			# Il fi
-			# Guarda nel file clone.out se il testo è != da 'Cloning into 'py'...' c'è stato ERRORE!!!!
+				self.entry3.set_text("INTERNET ASSENTE")
+
+			for file in os.popen(cmdFind).readlines():     # run find command
+# 2)		# Guarda nel file clone.out se il testo è 'Cloning into' c'è stato ERRORE!!!! 
 			# Guarda nel file clone.out se il testo è = a 'not found: did you run git update-server-info on the server? c'è stato ERRORE!!!! 
-			elif k == 0:
-				for file in os.popen(cmdFind).readlines():     # run find command
+				if strNR == 0:
 					print "CICLO FOR 2"
 					num  = 1
 					name = file[:-1]                       # strip '\n'
@@ -306,25 +293,70 @@ class GUI_git():
 #							print '--->', line[:-1]        # [:-1] strips final \n
 #							print '--->', ' '*pos + '*', '\n'
 						num = num+1
-				print "Stringa: ", str1, "TROVATA", strNR, "VOLTE"
-################
-# ATTENZIONE
-# POTREBBE ESSERE ANCHE L'ERRORE DOVUTO A:
-# fatal: Authenticatin failed
-# PER ERRORE DI USERNAME O PASSWORD O NOME DEL REPOSITORY
-################
-# e' necessario capire l'output del comando git
-################
+					print "Stringa: ", str1, "TROVATA", strNR, "VOLTE"
+					self.entry2.set_text("...internet assente.")
+					self.entry3.set_text("fatal: HTTP request failed")
+					break
+					
+# 3)		# Guarda nel file clone.out se il testo è = a 'not found: did you run git update-server-info on the server? c'è stato ERRORE!!!! 
+		
+				if strNR == 0:
+					print "CICLO FOR 3"
+					num  = 1
+					name = file[:-1]                       # strip '\n'
+					for line in open(name).readlines():    # scan the file
+								#pos = string.find(line, "\t")
+						pos = string.find(line, str2)
+						if  pos >= 0:
+							strNR = strNR +1
+#							print name, num, pos, str2	#, num, pos           # report tab found
+#							print '--->', line[:-1]        # [:-1] strips final \n
+#							print '--->', ' '*pos + '*', '\n'
+						num = num+1
+					print "Stringa: ", str1, "TROVATA", strNR, "VOLTE"
+					self.entry2.set_text(str2)
+					self.entry3.set_text(str2)
+					strNR = 0
 
-				self.entry2.set_text("...internet assente.")
-				self.entry3.set_text("fatal: HTTP request failed")
-				k == 1
-			#return
-		
-		
+				if strNR == 0:
+					print "CICLO FOR 2"
+					num  = 1
+					name = file[:-1]                       # strip '\n'
+					for line in open(name).readlines():    # scan the file
+								#pos = string.find(line, "\t")
+						pos = string.find(line, str1)		#"Cloning into" o "not found: did you run git"
+						if  pos >= 0:
+							strNR = strNR +1
+#							print name, num, pos, str2	#, num, pos           # report tab found
+#							print '--->', line[:-1]        # [:-1] strips final \n
+#							print '--->', ' '*pos + '*', '\n'
+						num = num+1
+					print "Stringa: ", str1, "TROVATA", strNR, "VOLTE"
+					self.entry2.set_text("...internet assente.")
+					self.entry3.set_text("fatal: HTTP request failed")
+					strNR = 0
+					
+				if strNR == 0:
+					print "CICLO FOR 2"
+					num  = 1
+					name = file[:-1]                       # strip '\n'
+					for line in open(name).readlines():    # scan the file
+								#pos = string.find(line, "\t")
+						pos = string.find(line, str1)		#"Cloning into" o "not found: did you run git"
+						if  pos >= 0:
+							strNR = strNR +1
+#							print name, num, pos, str2	#, num, pos           # report tab found
+#							print '--->', line[:-1]        # [:-1] strips final \n
+#							print '--->', ' '*pos + '*', '\n'
+						num = num+1
+					print "Stringa: ", str1, "TROVATA", strNR, "VOLTE"
+					self.entry2.set_text("...internet assente.")
+					self.entry3.set_text("fatal: HTTP request failed")
+
 #Comando GIT CLONE
 	def tog_clone(self, widget, data=None):
-		self.entry1.set_text("git clone https://github.com/belcocco/py0.020.git > clone.out")
+		NameFileOut = "clone.out"
+		self.entry1.set_text("git clone https://github.com/belcocco/py0.020.git &> clone.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
@@ -345,12 +377,13 @@ class GUI_git():
 		self.entry3.set_text("")
 #Comando GIT PUSH
 	def tog_push(self, widget, data=None):
-		self.entry1.set_text("git push https://github.com/belcocco/py0.020.git > push.out &")
+		NameFileOut = "push.out"
+		self.entry1.set_text("git push https://github.com/belcocco/py0.020.git &> push.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
 
-		
+	
 	def delete_event(self, widget, event, data=None):
 		return gtk.FALSE
 	def destroy(self, widget, data=None):
@@ -358,6 +391,7 @@ class GUI_git():
 
 class GUI_ftp():
 	def __init__(self):
+		print "----- GUI_ftp -------"
 		self.win = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.win.set_title("FTP")
 		self.win.set_default_size(400,95)
@@ -384,19 +418,6 @@ class GUI_ftp():
 		return gtk.FALSE
 	def destroy(self, widget, data=None):
 		return #gtk.main_quit()
-       
-#        self.connect("destroy", gtk.main_quit)
-#        self.win.set_default_size(800,95)
-#        self.set_size_request(250, 150)
-#        self.win.set_position(gtk.WIN_POS_CENTER)
-#        fixed = gtk.Fixed()
-#        git = gtk.Button("Download")
-#        fixed.put(git, 10, 10)
-
-#        blog = gtk.Button("Upload")
-#        fixed.put(blog, 10, 50)
-
-#        self.add(fixed)
  
 class GUI_hack:
 	def __init__(self):
@@ -464,10 +485,6 @@ class GUI_hack:
 		return gtk.FALSE
 	def destroy(self, widget, data=None):
 		return #gtk.main_quit()
-#	def main(self):
-#		gtk.main()
-
-#Rinomina le foto che arrivano dalla fotocamera
 
 class GUI_foto:
     def __init__(self):
@@ -968,20 +985,162 @@ class ClientFTP(object):
                 elif cmd == self.comandi[12]:
                         self.info()
 
+class Outwin():
+    def __init__(self, NameFileOut):
+        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        window.set_resizable(True)  
+        window.connect("destroy", self.close_application)
+        window.set_title("Output dei comandi")
+        window.set_border_width(0)
 
+        box1 = gtk.VBox(False, 0)
+        window.add(box1)
+        box1.show()
+
+        box2 = gtk.VBox(False, 10)
+        box2.set_border_width(10)
+        box1.pack_start(box2, True, True, 0)
+        box2.show()
+
+        sw = gtk.ScrolledWindow()
+        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        textview = gtk.TextView()
+        textbuffer = textview.get_buffer()
+        sw.add(textview)
+        sw.show()
+        textview.show()
+
+        box2.pack_start(sw)
+        # Carica il file generato dal comando git relativo ai messaggi di errore ecc.
+#        infile = open("clone.out", "r")
+        infile = open(NameFileOut, "r")
+
+        if infile:
+            string = infile.read()
+            infile.close()
+            textbuffer.set_text(string)
+
+        hbox = gtk.HButtonBox()
+        box2.pack_start(hbox, False, False, 0)
+        hbox.show()
+
+        vbox = gtk.VBox()
+        vbox.show()
+        hbox.pack_start(vbox, False, False, 0)
+        # check button to toggle editable mode
+        check = gtk.CheckButton("Editable")
+        vbox.pack_start(check, False, False, 0)
+        check.connect("toggled", self.toggle_editable, textview)
+        check.set_active(True)
+        check.show()
+        # check button to toggle cursor visiblity
+        check = gtk.CheckButton("Cursor Visible")
+        vbox.pack_start(check, False, False, 0)
+        check.connect("toggled", self.toggle_cursor_visible, textview)
+        check.set_active(True)
+        check.show()
+        # check button to toggle left margin
+        check = gtk.CheckButton("Left Margin")
+        vbox.pack_start(check, False, False, 0)
+        check.connect("toggled", self.toggle_left_margin, textview)
+        check.set_active(False)
+        check.show()
+        # check button to toggle right margin
+        check = gtk.CheckButton("Right Margin")
+        vbox.pack_start(check, False, False, 0)
+        check.connect("toggled", self.toggle_right_margin, textview)
+        check.set_active(False)
+        check.show()
+        # radio buttons to specify wrap mode
+        vbox = gtk.VBox()
+        vbox.show()
+        hbox.pack_start(vbox, False, False, 0)
+        radio = gtk.RadioButton(None, "WRAP__NONE")
+        vbox.pack_start(radio, False, True, 0)
+        radio.connect("toggled", self.new_wrap_mode, textview, gtk.WRAP_NONE)
+        radio.set_active(True)
+        radio.show()
+        radio = gtk.RadioButton(radio, "WRAP__CHAR")
+        vbox.pack_start(radio, False, True, 0)
+        radio.connect("toggled", self.new_wrap_mode, textview, gtk.WRAP_CHAR)
+        radio.show()
+        radio = gtk.RadioButton(radio, "WRAP__WORD")
+        vbox.pack_start(radio, False, True, 0)
+        radio.connect("toggled", self.new_wrap_mode, textview, gtk.WRAP_WORD)
+        radio.show()
+
+        # radio buttons to specify justification
+        vbox = gtk.VBox()
+        vbox.show()
+        hbox.pack_start(vbox, False, False, 0)
+        radio = gtk.RadioButton(None, "JUSTIFY__LEFT")
+        vbox.pack_start(radio, False, True, 0)
+        radio.connect("toggled", self.new_justification, textview,
+                      gtk.JUSTIFY_LEFT)
+        radio.set_active(True)
+        radio.show()
+        radio = gtk.RadioButton(radio, "JUSTIFY__RIGHT")
+        vbox.pack_start(radio, False, True, 0)
+        radio.connect("toggled", self.new_justification, textview,
+                      gtk.JUSTIFY_RIGHT)
+        radio.show()
+        radio = gtk.RadioButton(radio, "JUSTIFY__CENTER")
+        vbox.pack_start(radio, False, True, 0)
+        radio.connect("toggled", self.new_justification, textview,
+                      gtk.JUSTIFY_CENTER)
+        radio.show()
+
+        separator = gtk.HSeparator()
+        box1.pack_start(separator, False, True, 0)
+        separator.show()
+
+        box2 = gtk.VBox(False, 10)
+        box2.set_border_width(10)
+        box1.pack_start(box2, False, True, 0)
+        box2.show()
+
+        button = gtk.Button("Chiudi")
+        button.connect("clicked", self.close_application)
+        box2.pack_start(button, True, True, 0)
+        button.set_flags(gtk.CAN_DEFAULT)
+        button.grab_default()
+        button.show()
+        window.show()
+
+    def toggle_editable(self, checkbutton, textview):
+        textview.set_editable(checkbutton.get_active())
+
+    def toggle_cursor_visible(self, checkbutton, textview):
+        textview.set_cursor_visible(checkbutton.get_active())
+
+    def toggle_left_margin(self, checkbutton, textview):
+        if checkbutton.get_active():
+            textview.set_left_margin(50)
+        else:
+            textview.set_left_margin(0)
+
+    def toggle_right_margin(self, checkbutton, textview):
+        if checkbutton.get_active():
+            textview.set_right_margin(50)
+        else:
+            textview.set_right_margin(0)
+
+    def new_wrap_mode(self, radiobutton, textview, val):
+        if radiobutton.get_active():
+            textview.set_wrap_mode(val)
+
+    def new_justification(self, radiobutton, textview, val):
+        if radiobutton.get_active():
+            textview.set_justification(val)
+
+    def close_application(self, widget):
+        gtk.main_quit()
 
 ######## MAIN LOOP ########################
 #Questa è la finestra principale con i bottoni per startare le attività.
 #Si chiude con la 'X' in alto a destra 
 startMainWin = MainWin()
 startMainWin.show_all()
-
-#Questa è la finestra con gli output di tutte le attività
-#Volendo si può salvare quanto riportato in un file
-#Si chiude con la 'X' in alto a destra 
-#MainGlade = gtk.glade.XML("outwin.glade")			#file glade
-#outwin1 = MainGlade.get_widget("outwin1")			#outwin1 e widget contenuti in essa
-#outwin1.show()
 
 ######### FTP Client ############################
 #if __name__ == '__main__':
