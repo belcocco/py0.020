@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+#Creato da: Belcocco
+#Data:24-10-2012
+#Descrizione: Bottoni per avviare varie attività
+#
 #import module
 import pygtk, gtk
 pygtk.require('2.0')
@@ -34,6 +38,13 @@ from Queue import Queue, Empty
 
 #Importa moduli dell'utente
 
+#Dati fissi
+blu = gtk.gdk.color_parse('#7885ff') 
+verde = gtk.gdk.color_parse('#0E5023') 
+rosso = gtk.gdk.color_parse('#C51111')    
+ocra = gtk.gdk.color_parse('#D6D844')
+marine = gtk.gdk.color_parse('#0BC7B3')
+
 #Finestra principale con tutti i bottoni delle attività
 class MainWin(gtk.Window):
     def __init__(self):
@@ -44,8 +55,7 @@ class MainWin(gtk.Window):
 #        self.set_size_request(1000, 480)
         self.set_position(gtk.WIN_POS_MOUSE)
         self.labelpres = gtk.Label("Questa e' un interfaccia che racchiude esempi riassuntivi di oggetti GTK+/pyGTK")
-        color = gtk.gdk.color_parse('#C51111')    
-        self.modify_bg(gtk.STATE_NORMAL, color)    
+        self.modify_bg(gtk.STATE_NORMAL, verde)    
 
         self.connect("destroy", self.on_destroy)
 
@@ -151,10 +161,14 @@ class Presentazione:
         self.Presentazione.connect("delete_event", self.delete_event)
         self.Presentazione.connect("destroy", self.destroy)
 
+        self.Presentazione.button5 = gtk.Button("Linus")
+        self.Presentazione.button5("Clicked", GUI_git)
 
         hbox = gtk.HBox(False, 0)
+        hbox1 = gtk.HBox(False, 0) #<---
         vbox1 = gtk.VBox(False, 0)
         vbox2 = gtk.VBox(False, 0)
+        vbox3 = gtk.VBox(False, 0) #<---
         self.img = gtk.Image()
         self.img.set_from_file('auto421x316.png')
         self.immbutton = gtk.Button()
@@ -164,8 +178,11 @@ class Presentazione:
         self.immbuttonlbl2 = gtk.Label("e-mail: ramuff@gmail.com")
         vbox1.pack_start(self.immbutton, 10)
         vbox2.pack_start(self.immbuttonlbl1, 10)
+        vbox3.pack_start(self.Presentazione.button5, 10) #<---
+
         hbox.pack_start(vbox1, False, False, 10)
         hbox.pack_start(vbox2, False, False, 10)
+        hbox1.pack_start(vbox3, False, False, 10) #<---
         self.Presentazione.add(hbox)
         self.Presentazione.show_all()
  
@@ -192,8 +209,7 @@ class GUI_git():
 		self.win.set_position(gtk.WIN_POS_CENTER)
 		self.win.set_resizable(gtk.TRUE)
 		self.win.set_border_width(10)
-		color = gtk.gdk.color_parse('#7885ff')    
-		self.win.modify_bg(gtk.STATE_NORMAL, color)    
+		self.win.modify_bg(gtk.STATE_NORMAL, blu)    
 
 		self.win.connect("delete_event", self.delete_event)
 		self.win.connect("destroy", self.destroy)
@@ -247,6 +263,7 @@ class GUI_git():
 
 #Gestisce l'attività (clone, add, log, commit e push)
 	def exec_git_cmd(self, widget):
+		NameFileOut = ""
 		CMD_git = self.entry1.get_text()
 		print CMD_git
 		if CMD_git == "git clone https://github.com/belcocco/py0.020.git &> clone.out":
@@ -262,7 +279,8 @@ class GUI_git():
 
 		#Controlla se il comando è andato bene. SOLO POPEN !!!
 		proc.wait()
-		Outwin(NameFileOut)	#Visualizzazione della finestra degli errori
+		if NameFileOut != "":
+			Outwin(NameFileOut)	#Visualizzazione della finestra degli errori
 		print proc.returncode
 
 ########################### DA CANCELLARE #################
@@ -436,6 +454,7 @@ class GUI_foto:
         self.fotowin.connect("destroy", self.destroy)
         self.fotowin.set_border_width(2)
         self.fotowin.show_all()
+        self.fotowin.modify_bg(gtk.STATE_NORMAL, ocra)    
 
         self.tooltips = gtk.Tooltips()
         
@@ -923,9 +942,10 @@ class Outwin():
     def __init__(self, NameFileOut):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_resizable(True)  
-        window.connect("destroy", self.close_application)
+        window.connect("destroy", self.destroy)
         window.set_title("Output dei comandi")
         window.set_border_width(0)
+        window.modify_bg(gtk.STATE_NORMAL, rosso)    
 
         box1 = gtk.VBox(False, 0)
         window.add(box1)
@@ -1033,12 +1053,12 @@ class Outwin():
         box1.pack_start(box2, False, True, 0)
         box2.show()
 
-        button = gtk.Button("Chiudi")
-        button.connect("clicked", self.close_application)
-        box2.pack_start(button, True, True, 0)
-        button.set_flags(gtk.CAN_DEFAULT)
-        button.grab_default()
-        button.show()
+#        button = gtk.Button("Chiudi")
+#        button.connect("clicked", self.destroy)
+#        box2.pack_start(button, True, True, 0)
+#        button.set_flags(gtk.CAN_DEFAULT)
+#        button.grab_default()
+#        button.show()
         window.show()
 
     def toggle_editable(self, checkbutton, textview):
@@ -1067,8 +1087,8 @@ class Outwin():
         if radiobutton.get_active():
             textview.set_justification(val)
 
-    def close_application(self, widget):
-        gtk.main_quit()
+    def destroy(self, widget):
+        return #gtk.main_quit()
 
 ######## MAIN LOOP ########################
 #Questa è la finestra principale con i bottoni per startare le attività.

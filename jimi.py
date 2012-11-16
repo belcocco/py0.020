@@ -38,6 +38,7 @@ class Window:		#la classe principale contenete tutte le funzoni
 	
 	self.win.connect("destroy", self.exit)		#assegno al pulsante destroy 
 	self.labelcent = gtk.Label("Questa e' un interfaccia che racchiude esempi riassuntivi di oggetti GTK+/pyGTK")
+#	self.labelcent = gtk.Label("Questa GTK+/pyGTK")
 	
 #--------------------------------------------------------------
 	#DEFINISCO TUTTI  I BOTTONI DELLA FINESTRA
@@ -84,9 +85,12 @@ class Window:		#la classe principale contenete tutte le funzoni
 	vbox2.pack_start(self.button3, False, False, 5)
 	vbox2.pack_start(self.button6, False, False, 5)
 	vbox2.pack_start(self.button9, False, False, 5)
+
 	vbox3.pack_start(self.frame, False, False, 10)
+
 	vbox4.pack_start(self.button, False, 1, 10)
 	vbox5.pack_start(self.but, False, 1, 10)
+
 	hbox.pack_start(vbox3, False, False)
 	hbox1.pack_start(vbox, True, True, 5)
 	hbox1.pack_start(vbox1, True, True, 5)
