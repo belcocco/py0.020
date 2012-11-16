@@ -131,6 +131,13 @@ class MainWin(gtk.Window):
 		#INSERIRE la procedura di apertura della finestra GUI() al click del git-button
         app = Presentazione()						#si apre la finestra dell'applicazione
         app.Presentazione.show_all()
+############## FAR DIVENTARE UNA DEF - Visualizza contenuto di un file ###########
+#			f = open('clone.out')
+#			lines = f.readlines()
+#			f.close()
+# 			for line in lines:
+#				print line,
+###################################################################################
 
 #		gtk.main_quit()
 
@@ -242,116 +249,43 @@ class GUI_git():
 	def exec_git_cmd(self, widget):
 		CMD_git = self.entry1.get_text()
 		print CMD_git
-		self.entry2.set_text("Tutto Fatto.")   #Se NON si vede è perchè manca '&' alla fine del comando shell
+		if CMD_git == "git clone https://github.com/belcocco/py0.020.git &> clone.out":
+			NameFileOut = "clone.out"
+		if CMD_git == "git push https://github.com/belcocco/py0.020.git &> push.out":
+			NameFileOut = "push.out"
+
+		self.entry2.set_text("OK, tutto fatto !")   #Se NON si vede è perchè manca '&' alla fine del comando shell
 
 		#Esegui comando della shell. Ciò che FUNZIONA MEGLIO. 
 		proc = subprocess.Popen(CMD_git, shell=True) #, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 #		proc = subprocess.check_call(CMD_git, shell=True) #, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
-		#Controlla se il comando è andato bene. SOLO POPEN
+		#Controlla se il comando è andato bene. SOLO POPEN !!!
 		proc.wait()
+		Outwin(NameFileOut)	#Visualizzazione della finestra degli errori
 		print proc.returncode
-		k = 0
-		str1 = ""		#non viene eseguito nessun ciclo FOR. Basta guardare se il file è VUOTO.
-		str2 = "Cloning into"
-		str3 = "not found: did you run git"
-		str4 = "fatal: HTTP request failed"
-		str5 = "fatal: Authentication failed"
-		strNR = 0
-		cmdFind = 'find . -name "clone.out" -print'    # Cerca nel file clone.out
 
-		#Guarda se il comando git clone .... ha dato errrori
+########################### DA CANCELLARE #################
+#		k = 0
+#		str1 = ""		#non viene eseguito nessun ciclo FOR. Basta guardare se il file è VUOTO.
+#		str2 = "Cloning into"
+#		str3 = "not found: did you run git"
+#		str4 = "fatal: HTTP request failed"
+#		str5 = "fatal: Authentication failed"
+#		strNR = 0
+#		cmdFind = 'find . -name "clone.out" -print'    # Cerca nel file clone.out
+###########################################################
+
+		#Guarda se il comando git clone/push .... ha dato errrori
 		if proc.returncode != 0:
-			Outwin(NameFileOut)	#Visualizzazione della finestra degli errori
-###################### DA CANCELLARE ###########
-#			f = open('clone.out')
-#			lines = f.readlines()
-#			f.close()
-# 			for line in lines:
-#				print line,
-######################
+			self.entry2.set_text("...terminato con ERRORE !")
 			#C'E' ERRORE per INTERNET SCONNESSA, ma esiste già la dir del clonaggio?
 			#Guarda se il file clone.out è vuoto 
 			if os.stat(NameFileOut).st_size == 0:
 				#Errore: il path di destinazione esiste già e non è una directory vuota."
-				self.entry2.set_text("...terminato con ERRORE !")
-				self.entry3.set_text("INTERNET ASSENTE")
+				self.entry3.set_text("..terminato con ERRORE e con OUTPUT VUOTO (???)")
 
-			for file in os.popen(cmdFind).readlines():     # run find command
-# 2)		# Guarda nel file clone.out se il testo è 'Cloning into' c'è stato ERRORE!!!! 
-			# Guarda nel file clone.out se il testo è = a 'not found: did you run git update-server-info on the server? c'è stato ERRORE!!!! 
-				if strNR == 0:
-					print "CICLO FOR 2"
-					num  = 1
-					name = file[:-1]                       # strip '\n'
-					for line in open(name).readlines():    # scan the file
-								#pos = string.find(line, "\t")
-						pos = string.find(line, str1)		#"Cloning into" o "not found: did you run git"
-						if  pos >= 0:
-							strNR = strNR +1
-#							print name, num, pos, str2	#, num, pos           # report tab found
-#							print '--->', line[:-1]        # [:-1] strips final \n
-#							print '--->', ' '*pos + '*', '\n'
-						num = num+1
-					print "Stringa: ", str1, "TROVATA", strNR, "VOLTE"
-					self.entry2.set_text("...internet assente.")
-					self.entry3.set_text("fatal: HTTP request failed")
-					break
-					
-# 3)		# Guarda nel file clone.out se il testo è = a 'not found: did you run git update-server-info on the server? c'è stato ERRORE!!!! 
-		
-				if strNR == 0:
-					print "CICLO FOR 3"
-					num  = 1
-					name = file[:-1]                       # strip '\n'
-					for line in open(name).readlines():    # scan the file
-								#pos = string.find(line, "\t")
-						pos = string.find(line, str2)
-						if  pos >= 0:
-							strNR = strNR +1
-#							print name, num, pos, str2	#, num, pos           # report tab found
-#							print '--->', line[:-1]        # [:-1] strips final \n
-#							print '--->', ' '*pos + '*', '\n'
-						num = num+1
-					print "Stringa: ", str1, "TROVATA", strNR, "VOLTE"
-					self.entry2.set_text(str2)
-					self.entry3.set_text(str2)
-					strNR = 0
 
-				if strNR == 0:
-					print "CICLO FOR 2"
-					num  = 1
-					name = file[:-1]                       # strip '\n'
-					for line in open(name).readlines():    # scan the file
-								#pos = string.find(line, "\t")
-						pos = string.find(line, str1)		#"Cloning into" o "not found: did you run git"
-						if  pos >= 0:
-							strNR = strNR +1
-#							print name, num, pos, str2	#, num, pos           # report tab found
-#							print '--->', line[:-1]        # [:-1] strips final \n
-#							print '--->', ' '*pos + '*', '\n'
-						num = num+1
-					print "Stringa: ", str1, "TROVATA", strNR, "VOLTE"
-					self.entry2.set_text("...internet assente.")
-					self.entry3.set_text("fatal: HTTP request failed")
-					strNR = 0
-					
-				if strNR == 0:
-					print "CICLO FOR 2"
-					num  = 1
-					name = file[:-1]                       # strip '\n'
-					for line in open(name).readlines():    # scan the file
-								#pos = string.find(line, "\t")
-						pos = string.find(line, str1)		#"Cloning into" o "not found: did you run git"
-						if  pos >= 0:
-							strNR = strNR +1
-#							print name, num, pos, str2	#, num, pos           # report tab found
-#							print '--->', line[:-1]        # [:-1] strips final \n
-#							print '--->', ' '*pos + '*', '\n'
-						num = num+1
-					print "Stringa: ", str1, "TROVATA", strNR, "VOLTE"
-					self.entry2.set_text("...internet assente.")
-					self.entry3.set_text("fatal: HTTP request failed")
 
 #Comando GIT CLONE
 	def tog_clone(self, widget, data=None):
