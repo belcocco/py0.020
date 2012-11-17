@@ -1,2 +1,2 @@
-error: Could not resolve host: (nil); Unknown error while accessing https://github.com/belcocco/py0.020.git/info/refs
+error: The requested URL returned error: 403 while accessing https://github.com/belcocco/py0.020.git/info/refs
 fatal: HTTP request failed
