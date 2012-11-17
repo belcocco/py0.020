@@ -45,8 +45,10 @@ verde = gtk.gdk.color_parse('#1FCC3F')
 rosso = gtk.gdk.color_parse('#C51111')    
 ocra = gtk.gdk.color_parse('#D6D944')
 marine = gtk.gdk.color_parse('#0BC7B3')
-giallo = gtk.gdk.color_parse('#FFFF00') 
+giallo = gtk.gdk.color_parse('#FFFF00')
 
+clonetext = "git clone https://github.com/belcocco/py0.020.git &> clone.out" 
+pushtext = "git push https://github.com/belcocco/py0.020.git master &> push.out"
 #Finestra principale con tutti i bottoni delle attività
 class MainWin(gtk.Window):
     def __init__(self):
@@ -267,9 +269,9 @@ class GUI_git():
 		self.entry3.set_text(" ")
 		CMD_git = self.entry1.get_text()
 		print CMD_git
-		if CMD_git == "git clone https://github.com/belcocco/py0.020.git &> clone.out":
+		if CMD_git == clonetext: #"git clone https://github.com/belcocco/py0.020.git &> clone.out":
 			NameFileOut = "clone.out"
-		if CMD_git == "git push https://github.com/belcocco/py0.020.git &> push.out":
+		if CMD_git == pushtext: #"git push https://github.com/belcocco/py0.020.git master &> push.out":
 			NameFileOut = "push.out"
 
 		self.entry2.set_text("OK, tutto fatto !")   #Se NON si vede è perchè manca '&' alla fine del comando shell
@@ -303,11 +305,15 @@ class GUI_git():
 			if os.stat(NameFileOut).st_size == 0:
 				#Errore: il path di destinazione esiste già e non è una directory vuota."
 				self.entry3.set_text("..terminato con ERRORE e con OUTPUT VUOTO (???)")
+		elif CMD_git == pushtext:
+			self.entry3.set_text("Commit eseguto con SUCCESSO sul repository di GITHUB")
 
+		
+		
 #Comando GIT CLONE
 	def tog_clone(self, widget, data=None):
 		NameFileOut = "clone.out"
-		self.entry1.set_text("git clone https://github.com/belcocco/py0.020.git &> clone.out")
+		self.entry1.set_text(clonetext) #"git clone https://github.com/belcocco/py0.020.git &> clone.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
@@ -334,7 +340,7 @@ class GUI_git():
 #Comando GIT PUSH
 	def tog_push(self, widget, data=None):
 		NameFileOut = "push.out"
-		self.entry1.set_text("git push https://github.com/belcocco/py0.020.git &> push.out")
+		self.entry1.set_text(pushtext) #"git push https://github.com/belcocco/py0.020.git &> push.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])

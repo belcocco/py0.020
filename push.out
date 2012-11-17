@@ -1,2 +1,2 @@
-error: The requested URL returned error: 403 while accessing https://github.com/belcocco/py0.020.git/info/refs
-fatal: HTTP request failed
+To https://github.com/belcocco/py0.020.git
+   d688972..73cb73f  master -> master
