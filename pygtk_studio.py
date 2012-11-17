@@ -32,6 +32,7 @@ import time
 import string
 import shutil
 import tempfile
+import pango
 from subprocess import Popen, PIPE
 from threading import Thread
 from Queue import Queue, Empty
@@ -77,17 +78,17 @@ class MainWin(gtk.Window):
         hack.set_size_request(100, 40)
         fixed.put(hack, 10, 90)
 
-        attwin = gtk.Button("Attività")
-        attwin.connect("clicked", self.on_clicked_attwin)
-        attwin.set_size_request(100, 40)
-        fixed.put(attwin, 10, 130)
+        attvarwin = gtk.Button("Attività Varie")
+        attvarwin.connect("clicked", self.on_clicked_attvarwin)
+        attvarwin.set_size_request(100, 40)
+        fixed.put(attvarwin, 10, 130)
         
         foto = gtk.Button("Foto")
         foto.connect("clicked", self.on_clicked_foto)
         foto.set_size_request(100, 40)
         fixed.put(foto, 10, 170)
 
-        comando1 = gtk.Button("Comando1")
+        comando1 = gtk.Button("Pango")
         comando1.connect("clicked", self.on_clicked_comando1)
         comando1.set_size_request(100, 40)
         fixed.put(comando1, 10, 210)
@@ -120,12 +121,11 @@ class MainWin(gtk.Window):
         GUI_hack()						#si apre la finestra dell'applicazione
 #       gtk.main_quit()
 
-    def on_clicked_attwin(self, widget):
+    def on_clicked_attvarwin(self, widget):
 		#INSERIRE la procedura di apertura della finestra GUI() al click del git-button
 		print "PRIMA di Attività varie"
-		Attwin()
+		Attvarwin()
 		print "DOPO Attività varie"
-#		app = ListaWin()
 #		gtk.main_quit()
 
     def on_clicked_foto(self, widget):
@@ -136,7 +136,8 @@ class MainWin(gtk.Window):
 
     def on_clicked_comando1(self, widget):
 		#INSERIRE la procedura di apertura della finestra GUI() al click del git-button
-		import eseguicmd
+		PangoApp()
+#		import eseguicmd
 
     def on_clicked_autore(self, widget):
 		#INSERIRE la procedura di apertura della finestra GUI() al click del git-button
@@ -223,6 +224,10 @@ class GUI_git():
 		self.button_add = gtk.Button("ADD")
 		self.button_add.connect("clicked", self.tog_add, "Add")
 		self.vbox.pack_start(self.button_add, gtk.TRUE, gtk.TRUE, 0)
+#Bottone Status
+		self.button_status = gtk.Button("STATUS")
+		self.button_status.connect("clicked", self.tog_status, "Status")
+		self.vbox.pack_start(self.button_status, gtk.TRUE, gtk.TRUE, 0)
 #Bottone Log
 		self.button_log = gtk.Button("LOG")
 		self.button_log.connect("clicked", self.tog_log, "Log")
@@ -258,8 +263,8 @@ class GUI_git():
 #Gestisce l'attività (clone, add, log, commit e push)
 	def exec_git_cmd(self, widget):
 		NameFileOut = ""
-		self.entry2.set_text("")
-		self.entry3.set_text("")
+		self.entry2.set_text(" ")
+		self.entry3.set_text(" ")
 		CMD_git = self.entry1.get_text()
 		print CMD_git
 		if CMD_git == "git clone https://github.com/belcocco/py0.020.git &> clone.out":
@@ -311,7 +316,12 @@ class GUI_git():
 		self.entry1.set_text("git add *")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
-#Comando GIT LOG
+#Comando GIT STATUS
+	def tog_status(self, widget, data=None):
+		self.entry1.set_text("git status")
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+##Comando GIT LOG
 	def tog_log(self, widget, data=None):
 		self.entry1.set_text("git log | grep studio")
 		self.entry2.set_text("")
@@ -344,7 +354,13 @@ class GUI_ftp():
 		self.win.set_position(gtk.WIN_POS_CENTER)
 		self.win.set_resizable(gtk.TRUE)
 		self.win.set_border_width(10)
-		self.win.modify_bg(gtk.STATE_NORMAL, giallo)    
+		self.win.modify_bg(gtk.STATE_NORMAL, giallo)
+		pango.Layout.set_text(unicode("""
+pygtk-studio is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ See the GNU General Public License for more details.
+""", "latin-1"))    
 ################
 #		self.win.set_title("Aspect Frame")
 #		self.win.connect("destroy", lambda x: gtk.main_quit())
@@ -1111,10 +1127,10 @@ class Outwin():
 
 #includo le librerie necessarie 
 
-class Attwin:		#la classe principale contenete tutte le funzoni
+class Attvarwin:		#la classe principale contenete tutte le funzoni
     def __init__(self):		#la funzione princuipale della classe
         self.win = gtk.Window(gtk.WINDOW_TOPLEVEL)		#la finestra contenitore
-        self.win.set_title("Riassunto funzioni")		#setta il titolo della finestra
+        self.win.set_title("Attività Varie")		#setta il titolo della finestra
 #---------------------------------------------------------------
 	#definisco tutte le variabili dei box
 #----------------------------------------------------------------
@@ -1132,7 +1148,7 @@ class Attwin:		#la classe principale contenete tutte le funzoni
 #-------------------------------------------------------------
 	
 	self.win.connect("destroy", self.exit)		#assegno al pulsante destroy 
-	self.labelcent = gtk.Label("Questa e' un interfaccia che racchiude esempi riassuntivi di oggetti GTK+/pyGTK")
+	self.labelcent = gtk.Label("yum update, ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc.")
 #	self.labelcent = gtk.Label("Questa GTK+/pyGTK")
 	
 #--------------------------------------------------------------
@@ -1166,7 +1182,7 @@ class Attwin:		#la classe principale contenete tutte le funzoni
 #------------------------------------------------------------------
 	
 	#questo frame contiene  la label :"labelcent"
-	self.frame = gtk.Frame("Introduzione")
+	self.frame = gtk.Frame("Elenco delle attività")
 	self.frame.add(self.labelcent)
 	
 #-------------------------------------------------------------------
@@ -1725,6 +1741,42 @@ class Attwin:		#la classe principale contenete tutte le funzoni
  
     def main(self):							#esegue il tutto
         gtk.main()
+
+text = "Valour fate kinship darkness"
+
+
+class PangoApp(gtk.Window): 
+    def __init__(self):
+        super(PangoApp, self).__init__()
+        
+        self.connect("destroy", gtk.main_quit)
+        self.set_title("Attributes")
+        
+        label = gtk.Label(text)
+
+        attr = pango.AttrList()
+        
+        fg_color = pango.AttrForeground(65535, 0, 0, 0, 6)
+        underline = pango.AttrUnderline(pango.UNDERLINE_DOUBLE, 7, 11)
+        bg_color = pango.AttrBackground(40000, 40000, 40000, 12, 19)
+        strike = pango.AttrStrikethrough(True, 20, 29)
+        size = pango.AttrSize(30000, 0, -1)
+
+        attr.insert(fg_color)
+        attr.insert(underline)
+        attr.insert(bg_color)
+        attr.insert(size)
+        attr.insert(strike)
+
+        label.set_attributes(attr)
+
+        fix = gtk.Fixed()
+
+        fix.put(label, 5, 5)
+        
+        self.add(fix)
+        self.set_position(gtk.WIN_POS_CENTER)
+        self.show_all()
 
 
 ######## MAIN LOOP ########################
