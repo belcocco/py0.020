@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: latin-1 -*-
+# -*- coding: utf-8 -*-
 
 # pygtk_studio.py
 # Copyright (C) 2012 belcocco <belcocco@gmail.com>
@@ -19,8 +19,29 @@
 #
 #Creato da: Belcocco
 #Data:24-10-2012
-#Descrizione: Bottoni per avviare varie attività
-#
+#Descrizione: Attributi Pango
+''''class pango.Attribute:
+    def pango.attr_type_register(name)
+    def pango.AttrLanguage(language, start_index=0, end_index=1)
+    def pango.AttrFamily(family, start_index=0, end_index=1)
+    def pango.AttrForeground(red, green, blue, start_index=0, end_index=1)
+    def pango.AttrBackground(red, green, blue, start_index=0, end_index=1)
+    def pango.AttrSize(size, start_index=0, end_index=1)
+    def pango.AttrStyle(style, start_index=0, end_index=1)
+    def pango.AttrWeight(weight, start_index=0, end_index=1)
+    def pango.AttrVariant(variant, start_index=0, end_index=1)
+    def pango.AttrStretch(stretch, start_index=0, end_index=1)
+    def pango.AttrFontDesc(desc, start_index=0, end_index=1)
+    def pango.AttrUnderline(underline, start_index=0, end_index=1)
+    def pango.AttrStrikethrough(strikethrough, start_index=0, end_index=1)
+    def pango.AttrRise(rise, start_index=0, end_index=1)
+    def pango.AttrShape(ink_rect, logical_rect, start_index=0, end_index=1)
+    def pango.AttrScale(scale, start_index=0, end_index=1)
+    def pango.AttrFallback(fallback, start_index=0, end_index=1)
+    def pango.AttrSizeAbsolute(size, start_index=0, end_index=1)
+    def pango.AttrUnderlineColor(red, green, blue, start_index=0, end_index=1)
+    def pango.AttrStrikethroughColor(red, green, blue, start_index=0, end_index=1)
+    def pango.AttrLetterSpacing(letter_spacing, start_index=0, end_index=1)#'''
 #import module
 import pygtk, gtk
 pygtk.require('2.0')
@@ -46,9 +67,23 @@ rosso = gtk.gdk.color_parse('#C51111')
 ocra = gtk.gdk.color_parse('#D6D944')
 marine = gtk.gdk.color_parse('#0BC7B3')
 giallo = gtk.gdk.color_parse('#FFFF00')
-
+	#Pango
+fg_color = pango.AttrForeground(65535, 0, 0, 0, 6)
+underline = pango.AttrUnderline(pango.UNDERLINE_DOUBLE, 7, 11)
+bg_color = pango.AttrBackground(40000, 40000, 40000, 12, 19)
+strike = pango.AttrStrikethrough(True, 20, 29)
+size = pango.AttrSize(30000, 0, -1)
+	#Testi vari
+txt_clone = "CLONE"
+txt_push = "PUSH"
+testtext = "Ti sì che te se un hom, minga tò surela!"
 clonetext = "git clone https://github.com/belcocco/py0.020.git &> clone.out" 
 pushtext = "git push https://github.com/belcocco/py0.020.git master &> push.out"
+obj = unicode(u'''Фёдор Михайлович Достоевский родился 30 октября (11 ноября)
+1821 года в Москве. Был вторым из 7 детей. Отец, Михаил Андреевич, 
+работал вгоспитале для бедных. Мать, Мария Фёдоровна 
+(в девичестве Нечаева), происходила из купеческого рода.''')
+
 #Finestra principale con tutti i bottoni delle attività
 class MainWin(gtk.Window):
     def __init__(self):
@@ -138,7 +173,8 @@ class MainWin(gtk.Window):
 
     def on_clicked_comando1(self, widget):
 		#INSERIRE la procedura di apertura della finestra GUI() al click del git-button
-		PangoApp()
+		PangoApp1()
+		PangoApp2()
 #		import eseguicmd
 
     def on_clicked_autore(self, widget):
@@ -219,7 +255,7 @@ class GUI_git():
 		self.vbox.show()
 
 #ToggleButton per l'attività Clone (con il repo remoto)
-		self.tog_button_clone = gtk.ToggleButton("CLONE")
+		self.tog_button_clone = gtk.ToggleButton(txt_clone)
 		self.tog_button_clone.connect("clicked", self.tog_clone, "Download")
 		self.vbox.pack_start(self.tog_button_clone, gtk.TRUE, gtk.TRUE, 5)
 #Bottone Add
@@ -239,7 +275,7 @@ class GUI_git():
 		self.button_commit.connect("clicked", self.tog_commit, "Commit")
 		self.vbox.pack_start(self.button_commit, gtk.TRUE, gtk.TRUE, 0)
 #ToggleButton per l'attività Push (con il repo remoto)
-		self.tog_button_push = gtk.ToggleButton("PUSH")
+		self.tog_button_push = gtk.ToggleButton(txt_push)
 		self.tog_button_push.connect("clicked", self.tog_push, "Upload")
 		self.vbox.pack_start(self.tog_button_push, gtk.TRUE, gtk.TRUE, 5)
 
@@ -271,20 +307,18 @@ class GUI_git():
 		print CMD_git
 		if CMD_git == clonetext: #"git clone https://github.com/belcocco/py0.020.git &> clone.out":
 			NameFileOut = "clone.out"
-		if CMD_git == pushtext: #"git push https://github.com/belcocco/py0.020.git master &> push.out":
+		elif CMD_git == pushtext: #"git push https://github.com/belcocco/py0.020.git master &> push.out":
 			NameFileOut = "push.out"
-
+		elif NameFileOut != "clone.out" or NameFileOut != "push.out":
+			NameFileOut = "git.out"
 		self.entry2.set_text("OK, tutto fatto !")   #Se NON si vede è perchè manca '&' alla fine del comando shell
 
 		#Esegui comando della shell. Ciò che FUNZIONA MEGLIO. 
-		proc = subprocess.Popen(CMD_git, shell=True) #, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 #		proc = subprocess.check_call(CMD_git, shell=True) #, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+		proc = subprocess.Popen(CMD_git, shell=True) #, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
-		#Controlla se il comando è andato bene. SOLO POPEN !!!
+		#Aspetta la fine del comando. SOLO POPEN !!!
 		proc.wait()
-		if NameFileOut != "":
-			Outwin(NameFileOut)	#Visualizzazione della finestra degli errori
-		print proc.returncode
 
 ########################### DA CANCELLARE #################
 #		k = 0
@@ -298,6 +332,7 @@ class GUI_git():
 ###########################################################
 
 		#Guarda se il comando git clone/push .... ha dato errrori
+		print NameFileOut
 		if proc.returncode != 0:
 			self.entry2.set_text("...terminato con ERRORE !")
 			#C'E' ERRORE per INTERNET SCONNESSA, ma esiste già la dir del clonaggio?
@@ -305,41 +340,48 @@ class GUI_git():
 			if os.stat(NameFileOut).st_size == 0:
 				#Errore: il path di destinazione esiste già e non è una directory vuota."
 				self.entry3.set_text("..terminato con ERRORE e con OUTPUT VUOTO (???)")
+		elif CMD_git == clonetext:
+			self.entry3.set_text("Clone eseguito con SUCCESSO in LOCALE")
 		elif CMD_git == pushtext:
-			self.entry3.set_text("Commit eseguto con SUCCESSO sul repository di GITHUB")
-
-		
+			self.entry3.set_text("Push eseguito con SUCCESSO sul repository di GITHUB")
+#		if NameFileOut != "":
+		Outwin(NameFileOut)	#Visualizzazione della finestra degli output del comando git
+		print proc.returncode
 		
 #Comando GIT CLONE
 	def tog_clone(self, widget, data=None):
-		NameFileOut = "clone.out"
+#		NameFileOut = "clone.out"
 		self.entry1.set_text(clonetext) #"git clone https://github.com/belcocco/py0.020.git &> clone.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
 #Comando GIT ADD
 	def tog_add(self, widget, data=None):
-		self.entry1.set_text("git add *")
+#		NameFileOut = "git.out"
+		self.entry1.set_text("git add * &> git.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 #Comando GIT STATUS
 	def tog_status(self, widget, data=None):
-		self.entry1.set_text("git status")
+#		NameFileOut = "git.out"
+		self.entry1.set_text("git status &> git.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 ##Comando GIT LOG
 	def tog_log(self, widget, data=None):
-		self.entry1.set_text("git log | grep studio")
+#		NameFileOut = "git.out"
+		self.entry1.set_text("git log | grep studio &> git.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 #Comando GIT COMMIT
 	def tog_commit(self, widget, data=None):
-		self.entry1.set_text("git commit -m -----")
+#		NameFileOut = "git.out"
+		self.entry1.set_text("git commit -m ----- &> git.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
 #Comando GIT PUSH
 	def tog_push(self, widget, data=None):
-		NameFileOut = "push.out"
+#		NameFileOut = "push.out"
 		self.entry1.set_text(pushtext) #"git push https://github.com/belcocco/py0.020.git &> push.out")
 		self.entry2.set_text("")
 		self.entry3.set_text("")
@@ -360,13 +402,9 @@ class GUI_ftp():
 		self.win.set_position(gtk.WIN_POS_CENTER)
 		self.win.set_resizable(gtk.TRUE)
 		self.win.set_border_width(10)
-		self.win.modify_bg(gtk.STATE_NORMAL, giallo)
-		pango.Layout.set_text(unicode("""
-pygtk-studio is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- See the GNU General Public License for more details.
-""", "latin-1"))    
+		self.win.modify_bg(gtk.STATE_NORMAL, rosso)
+		pango.Layout.set_text("git push https://github.com/belcocco/py0.020.git &> push.out")
+    
 ################
 #		self.win.set_title("Aspect Frame")
 #		self.win.connect("destroy", lambda x: gtk.main_quit())
@@ -986,7 +1024,7 @@ class Outwin():
         window.connect("destroy", self.destroy)
         window.set_title("Output dei comandi")
         window.set_border_width(0)
-        window.modify_bg(gtk.STATE_NORMAL, rosso)    
+        window.modify_bg(gtk.STATE_NORMAL, giallo)    
 
         box1 = gtk.VBox(False, 0)
         window.add(box1)
@@ -1131,10 +1169,8 @@ class Outwin():
     def destroy(self, widget):
         return #gtk.main_quit()
 
-#includo le librerie necessarie 
-
-class Attvarwin:		#la classe principale contenete tutte le funzoni
-    def __init__(self):		#la funzione princuipale della classe
+class Attvarwin:		#la classe principale contenete tutte le funzioni
+    def __init__(self):		#la funzione principale della classe
         self.win = gtk.Window(gtk.WINDOW_TOPLEVEL)		#la finestra contenitore
         self.win.set_title("Attività Varie")		#setta il titolo della finestra
 #---------------------------------------------------------------
@@ -1156,6 +1192,13 @@ class Attvarwin:		#la classe principale contenete tutte le funzoni
 	self.win.connect("destroy", self.exit)		#assegno al pulsante destroy 
 	self.labelcent = gtk.Label("yum update, ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc.")
 #	self.labelcent = gtk.Label("Questa GTK+/pyGTK")
+#		lbl_clone = gtk.Label(txt_clone)
+	fg_color_Att = pango.AttrForeground(65535, 0, 0, 0, 1000)
+	size_Att = pango.AttrSize(20000, 0, -1)
+	attr = pango.AttrList()
+	attr.insert(fg_color_Att)
+	attr.insert(size_Att)
+	self.labelcent.set_attributes(attr)
 	
 #--------------------------------------------------------------
 	#DEFINISCO TUTTI  I BOTTONI DELLA FINESTRA
@@ -1748,25 +1791,39 @@ class Attvarwin:		#la classe principale contenete tutte le funzoni
     def main(self):							#esegue il tutto
         gtk.main()
 
-text = "Valour fate kinship darkness"
 
 
-class PangoApp(gtk.Window): 
+
+
+class PangoApp1(gtk.Window): 
     def __init__(self):
-        super(PangoApp, self).__init__()
+        super(PangoApp1, self).__init__()
         
-        self.connect("destroy", gtk.main_quit)
+#        self.connect("destroy", gtk.main_quit)
+        self.set_title("Unicode")
+        
+        label = gtk.Label(obj.encode('utf-8'))
+
+        fontdesc = pango.FontDescription("Georgia 10")
+        label.modify_font(fontdesc)
+
+        fix = gtk.Fixed()
+
+        fix.put(label, 5, 5)
+        
+        self.add(fix)
+        self.set_position(gtk.WIN_POS_CENTER)
+        self.show_all()
+
+class PangoApp2(gtk.Window): 
+    def __init__(self):
+        super(PangoApp2, self).__init__()
+        
+#        self.connect("destroy", gtk.main_quit)
         self.set_title("Attributes")
-        
-        label = gtk.Label(text)
+        label = gtk.Label(testtext)
 
         attr = pango.AttrList()
-        
-        fg_color = pango.AttrForeground(65535, 0, 0, 0, 6)
-        underline = pango.AttrUnderline(pango.UNDERLINE_DOUBLE, 7, 11)
-        bg_color = pango.AttrBackground(40000, 40000, 40000, 12, 19)
-        strike = pango.AttrStrikethrough(True, 20, 29)
-        size = pango.AttrSize(30000, 0, -1)
 
         attr.insert(fg_color)
         attr.insert(underline)
@@ -1775,7 +1832,8 @@ class PangoApp(gtk.Window):
         attr.insert(strike)
 
         label.set_attributes(attr)
-
+        color = pango.Color('#FFFF00')
+        print color
         fix = gtk.Fixed()
 
         fix.put(label, 5, 5)
