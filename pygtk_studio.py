@@ -79,7 +79,15 @@ txt_push = "PUSH"
 testtext = "Ti sì che te se un hom, minga tò surela!"
 clonetext = "git clone https://github.com/belcocco/py0.020.git &> clone.out" 
 pushtext = "git push https://github.com/belcocco/py0.020.git master &> push.out"
-obj = unicode(u'''Фёдор Михайлович Достоевский родился 30 октября (11 ноября)
+#
+#site = "localhost"
+#nick = "raga"
+#pwd = "ragamuz"
+site = "mirror3.mirror.garr.it"
+nick = "anonymous"
+pwd = ""
+
+objru = unicode(u'''Фёдор Михайлович Достоевский родился 30 октября (11 ноября)
 1821 года в Москве. Был вторым из 7 детей. Отец, Михаил Андреевич, 
 работал вгоспитале для бедных. Мать, Мария Фёдоровна 
 (в девичестве Нечаева), происходила из купеческого рода.''')
@@ -149,7 +157,7 @@ class MainWin(gtk.Window):
 
     def on_clicked_ftp(self, widget):
 		#INSERIRE la procedura di apertura della finestra GUI() al click del ftp-button
-        GUI_ftp()						#si apre la finestra dell'applicazione
+        ClientFTP(site ,nick, pwd)						#si apre la finestra dell'applicazione
 #        app.show_all()
 #       gtk.main_quit()
 
@@ -747,22 +755,27 @@ class GUI_foto:
         return #gtk.main_quit()
 
 class ClientFTP(object):
-        """Client FTP da linea di comando
-           Funzioni:               Comandi associati         Parametri: 
-              -Connessione              None                      site,nick,password
-              -Disconnessione           None                      None
-              -Lista File               LIST                      None
-              -Ricerca File             SEARCH                    nome_file
-              -Rinomina File            REN                       nome_file, directory, nuovoNome
-              -Elimina File             DEL                       nome_file, directory
-              -Download file            DW                        directory, filename, directory_di_uscita
-              -Download all file        DWA                       directory_remota, filename, directory_uscita
-              -Invio file               UPL                       nomeFile, directory_uscita 
-              -Cambio directory         CD                        place,  nome
-              -Informazione sulla
-               directory locale/remota   LD->Local Directory      None
-                                         RD->Remote Directory
-              """
+        """Client FTP da linea di comando (Tutt i comandi posso essere scritti in minuscolo)
+           Dopo aver avviato servono 'site' 'nick' e 'password' per attivare la 'Connessione'
+           Funzioni:               Comandi associati         esempio: 
+
+           -Directory locale         LD                        ld     (si vede dove punta)
+           -Directory remota         RD                        rd     (si vede dove punta)
+           -Cambio directory locale  CD                        cd l /nome_da_aggiungere_al_path_di_ld
+           -Cambio directory remota  CD                        cd r /nome_da_aggiungere_al_path_di_rd
+           -Lista File               LIST                      list (serve copiare la libreria ftplib.py in ????)
+           -Ricerca File             SEARCH                    search nome_file
+           -Rinomina File            REN                       ren nome_file directory nuovo_mome_file
+           -Elimina File             DEL                       del nome_file directory
+           -Download file            DW                        dw directory_remota filename directory_locale_di_uscita(_che può essere omessa)
+           -Download all file        DWA                       dwa directory_remota filename directory_locale_di_uscita(_che può essere omessa)
+           -Invio file               UPL                       upl nome_file directory_remota_di_uscita 
+                 -
+           -Disconnessione           QUIT                      quit
+
+            N.B.: DW e UPL cambiano automaticamente le dir di destinazione
+                  se differiscono dal puntamento (ld, rd) di prima del comando
+        """
         def __init__(self,site ,nick, pwd):
                 self.online = None
                 self.comandi = ['RD', 'LD', 'CD', 'DW','DWA','LIST','SEARCH','REN','DEL','UPL','QUIT','HELP','INFO']
@@ -770,7 +783,10 @@ class ClientFTP(object):
                 self.nick = nick
                 self.pwd = pwd
                 self.user = self.connection(self.site,self.nick,self.pwd)
-
+                while self.online:
+                    command = raw_input('ClientFTP >>> ')
+                    self.controlla_cmd(command)
+                
         def connection(self,site,nick,pwd):
                 """Comando: None    Parametri: Site, nick, password
                    Compito: Si connette al server alla porta:21 in modalità passiva"""

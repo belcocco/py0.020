@@ -6,22 +6,27 @@ import ftplib, os,  sys  #import module
 
                         
 class Client(object):
-        """Client FTP da linea di comando
-           Funzioni:               Comandi associati         Parametri: 
-              -Connessione              None                      site,nick,password
-              -Disconnessione           None                      None
-              -Lista File               LIST                      None
-              -Ricerca File             SEARCH                    nome_file
-              -Rinomina File            REN                       nome_file, directory, nuovoNome
-              -Elimina File             DEL                       nome_file, directory
-              -Download file            DW                        directory, filename, directory_di_uscita
-              -Download all file        DWA                       directory_remota, filename, directory_uscita
-              -Invio file               UPL                       nomeFile, directory_uscita 
-              -Cambio directory         CD                        place,  nome
-              -Informazione sulla
-               directory locale/remota   LD->Local Directory      None
-                                         RD->Remote Directory
-              """
+"""Client FTP da linea di comando (Tutt i comandi posso essere scritti in minuscolo)
+   Dopo aver avviato servono 'site' 'nick' e 'password' per attivare la 'Connessione'
+
+           Funzioni:               Comandi associati         esempio: 
+           -Directory locale         LD                        ld     (si vede dove punta)
+           -Directory remota         RD                        rd     (si vede dove punta)
+           -Cambio directory locale  CD                        cd l /nome_da_aggiungere_al_path_di_ld
+           -Cambio directory remota  CD                        cd r /nome_da_aggiungere_al_path_di_rd
+           -Lista File               LIST                      list (serve copiare la libreria ftplib.py in ????)
+           -Ricerca File             SEARCH                    search nome_file
+           -Rinomina File            REN                       ren nome_file directory nuovo_mome_file
+           -Elimina File             DEL                       del nome_file directory
+           -Download file            DW                        dw directory_remota filename directory_locale_di_uscita(_che può essere omessa)
+           -Download all file        DWA                       dwa directory_remota filename directory_locale_di_uscita(_che può essere omessa)
+           -Invio file               UPL                       upl nome_file directory_remota_di_uscita 
+           -
+           -Disconnessione           QUIT                      quit
+
+            N.B.: DW e UPL cambiano automaticamente le dir di destinazione
+                  se differiscono dal puntamento (ld, rd) di prima del comando
+"""
         def __init__(self,site ,nick, pwd):
                 self.online = None
                 self.comandi = ['RD', 'LD', 'CD', 'DW','DWA','LIST','SEARCH','REN','DEL','UPL','QUIT','HELP','INFO']
@@ -53,7 +58,7 @@ class Client(object):
         def local_directory(self):
                 """Comando: LD    Parametri: None
                    Computo: restiruisce informazioni sulla directory locale corrente"""
-                print 'Direcory locale corrente: %s' %(os.getcwd())
+                print 'Directory locale corrente: %s' %(os.getcwd())
         
         def remote_directory(self):
                 """Comando: RD   Parametri: None
@@ -209,6 +214,7 @@ class Client(object):
                                 comando_trovato = True
                                 cmd = x.upper()
                                 self.avvia_cmd(cmd,[y for y in comando if y != x])
+                                print "comando trovato. Ho scritto: ", cmd
                                 break
                         else:
                                 continue
@@ -276,15 +282,13 @@ class Client(object):
                 elif cmd == self.comandi[12]:
                         self.info()
 
-                        
-        
-
 if __name__ == '__main__':
-        nick = raw_input('Nick:')
-        pwd = raw_input('Password:')
-        site = raw_input('Sito:')
+        nick = "raga" #raw_input('Nick:')
+        pwd = "ragamuz" #raw_input('Password:')
+        site = "localhost" #raw_input('Sito:')
         obj = Client(site,nick,pwd)
         while obj.online: #while True
                 command = raw_input('pyFTP >>> ')
                 obj.controlla_cmd(command)      
         
+ 
