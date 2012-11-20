@@ -67,6 +67,7 @@ rosso = gtk.gdk.color_parse('#C51111')
 ocra = gtk.gdk.color_parse('#D6D944')
 marine = gtk.gdk.color_parse('#0BC7B3')
 giallo = gtk.gdk.color_parse('#FFFF00')
+carota = gtk.gdk.color_parse('#FC9060')
 	#Pango
 fg_color = pango.AttrForeground(65535, 0, 0, 0, 6)
 underline = pango.AttrUnderline(pango.UNDERLINE_DOUBLE, 7, 11)
@@ -79,13 +80,17 @@ txt_push = "PUSH"
 testtext = "Ti sì che te se un hom, minga tò surela!"
 clonetext = "git clone https://github.com/belcocco/py0.020.git &> clone.out" 
 pushtext = "git push https://github.com/belcocco/py0.020.git master &> push.out"
+txt_site_default = "localhost"
+txt_uname_default = "anonymous"
+txt_pswd_default = ""
+
 #
 #site = "localhost"
 #nick = "raga"
-#pwd = "ragamuz"
-site = "mirror3.mirror.garr.it"
-nick = "anonymous"
-pwd = ""
+#pswd = "ragamuz"
+#site = "na.mirror.garr.it"
+#nick = "anonymous"
+#pswd = ""
 
 objru = unicode(u'''Фёдор Михайлович Достоевский родился 30 октября (11 ноября)
 1821 года в Москве. Был вторым из 7 детей. Отец, Михаил Андреевич, 
@@ -157,7 +162,7 @@ class MainWin(gtk.Window):
 
     def on_clicked_ftp(self, widget):
 		#INSERIRE la procedura di apertura della finestra GUI() al click del ftp-button
-        ClientFTP(site ,nick, pwd)						#si apre la finestra dell'applicazione
+        GUI_ftp()						#si apre la finestra dell'applicazione
 #        app.show_all()
 #       gtk.main_quit()
 
@@ -406,52 +411,119 @@ class GUI_ftp():
 		print "----- GUI_ftp -------"
 		self.win = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.win.set_title("FTP")
-		self.win.set_default_size(400,95)
+		self.win.set_default_size(600,495)
 		self.win.set_position(gtk.WIN_POS_CENTER)
 		self.win.set_resizable(gtk.TRUE)
 		self.win.set_border_width(10)
-		self.win.modify_bg(gtk.STATE_NORMAL, rosso)
-		pango.Layout.set_text("git push https://github.com/belcocco/py0.020.git &> push.out")
-    
-################
-#		self.win.set_title("Aspect Frame")
-#		self.win.connect("destroy", lambda x: gtk.main_quit())
-#		self.win.set_border_width(10)
-
-        # Create an aspect_frame and add it to our toplevel window
-		aspect_frame = gtk.AspectFrame("2x1", # label
-										0.5, # center x
-										0.5, # center y
-										2, # xsize/ysize = 2
-										False) # ignore child's aspect
-		self.win.add(aspect_frame)
-		aspect_frame.show()
-
-		# Now add a child widget to the aspect frame
-		drawing_area = gtk.DrawingArea()
-
-		# Ask for a 200x200 window, but the AspectFrame will give us a 200x100
-		# window since we are forcing a 2x1 aspect ratio
-		drawing_area.set_size_request(200, 200)
-		aspect_frame.add(drawing_area)
-		drawing_area.show()
-#		self.win.show()
-###############################
+		self.win.modify_bg(gtk.STATE_NORMAL, carota)
 
 		self.win.connect("delete_event", self.delete_event)
 		self.win.connect("destroy", self.destroy)
 		self.win.show_all()
+
+############## Inserire i bottoni simili a GUI_git ###########
+		self.vbox = gtk.VBox(gtk.TRUE, 10)
+		self.win.add(self.vbox)
+		self.vbox.show()
+#PER ADESSO NESSUN BOTTONE
+#Bottone per inserire l'indirizzo del server FTP remoto (SITE)
+#		self.button_site = gtk.Button("INDIRIZZO SERVER")
+#		self.button_site.connect("clicked", self.tog_site, "Site")
+#		self.vbox.pack_start(self.button_site, gtk.TRUE, gtk.TRUE, 0)
+#Bottone per inserire il nome dell'utenete (default: anonymous)
+#		self.button_uname = gtk.Button("USERNAME")
+#		self.button_uname.connect("clicked", self.tog_uname, "Username")
+#		self.vbox.pack_start(self.button_uname, gtk.TRUE, gtk.TRUE, 0)
+#Bottone per inserire la password per l'accesso (default: none)
+#		self.button_pswd = gtk.Button("PASSWORD")
+#		self.button_pswd.connect("clicked", self.tog_pswd, "Password")
+#		self.vbox.pack_start(self.button_pswd, gtk.TRUE, gtk.TRUE, 0)
+#Bottone per vedere la directory del server FTP remoto
+#		self.button_list = gtk.Button("LIST")
+#		self.button_list.connect("clicked", self.tog_list, "List")
+#		self.vbox.pack_start(self.button_list, gtk.TRUE, gtk.TRUE, 0)
+#Bottone per eseguire il download da server ftp
+#		self.button_dload = gtk.Button("DOWNLOAD")
+#		self.button_dload.connect("clicked", self.tog_dload, "Download")
+#		self.vbox.pack_start(self.button_dload, gtk.TRUE, gtk.TRUE, 0)
+#Bottone per eseguire l'upload verso server ftp
+#		self.button_uload = gtk.Button("UPLOAD")
+#		self.button_uload.connect("clicked", self.tog_uload, "Upload")
+#		self.vbox.pack_start(self.button_uload, gtk.TRUE, gtk.TRUE, 0)
+#ToggleButton per ulteriore attività
+#		self.tog_button_push = gtk.ToggleButton(txt_push)
+#		self.tog_button_push.connect("clicked", self.tog_push, "Upload")
+#		self.vbox.pack_start(self.tog_button_push, gtk.TRUE, gtk.TRUE, 5)
+
+#Spazio per controllare l'inserimento del comando indirizzo server
+		self.entry1 = gtk.Entry(100)
+		self.vbox.pack_start(self.entry1, gtk.TRUE, gtk.TRUE, 0)
+#Spazio per per controllare l'inserimento del comando username
+		self.entry2 = gtk.Entry(100)
+		self.vbox.pack_start(self.entry2, gtk.TRUE, gtk.TRUE, 0)
+#Spazio per per controllare l'inserimento del comando password
+		self.entry3 = gtk.Entry(100)
+		self.vbox.pack_start(self.entry3, gtk.TRUE, gtk.TRUE, 0)
+#Bottone Esegui
+		self.button_exec = gtk.Button(None, gtk.STOCK_EXECUTE)
+		self.button_exec.connect("clicked", self.exec_ftp_cmd_connessione)
+		self.vbox.pack_start(self.button_exec, gtk.TRUE, gtk.TRUE, 0)
+		self.entry1.set_text(txt_site_default)
+		self.entry2.set_text(txt_uname_default)
+		self.entry3.set_text(txt_pswd_default)
 		
-######### FTP Client ############################
-#		if __name__ == '__main__':
-#		nick = raw_input('Nick:')
-#		pwd = raw_input('Password:')
-#		site = raw_input('Sito:')
-#		obj = ClientFTP(site,nick,pwd)
-#		while obj.online: #while True
-#			command = raw_input('pyFTP >>> ')
-#			obj.controlla_cmd(command)      
+		self.win.show_all()
+
+#Gestisce l'attività (ClientFTP)
+	def exec_ftp_cmd_connessione(self, widget):
+		site = self.entry1.get_text()
+		nick = self.entry2.get_text()
+		pswd = self.entry3.get_text()
+		print site
+		print nick
+		print pswd
+#		if CMD_ftp == clonetext: #"git clone https://github.com/belcocco/py0.020.git &> clone.out":
+#			NameFileOut = "clone.out"
+#		elif CMD_ftp == pushtext: #"git push https://github.com/belcocco/py0.020.git master &> push.out":
+#			NameFileOut = "push.out"
+#		elif NameFileOut != "clone.out" or NameFileOut != "push.out":
+#			NameFileOut = "git.out"
+#		self.entry2.set_text("OK, tutto fatto !")   #Se NON si vede è perchè manca '&' alla fine del comando shell
 #################################################
+		ClientFTP(site ,nick, pswd)				#Avvio del client FTP
+#################################################
+#Comando FTP SITE
+	def tog_site(self, widget, data=None):
+		self.entry1.set_text(txt_site_default)
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+#Comando FTP USERNAME
+	def tog_uname(self, widget, data=None):
+		self.entry1.set_text("anonymous")
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+#Comando FTP PASSWORD
+	def tog_pswd(self, widget, data=None):
+		self.entry1.set_text(txt_pswd_default)  
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+##Comando FTP LIST
+	def tog_list(self, widget, data=None):
+		NameFileOut = "list.out"
+		self.entry1.set_text("list")
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+#Comando FTP DOWNLOAD
+	def tog_dload(self, widget, data=None):
+		self.entry1.set_text("dw")
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+#Comando FTP UPLOAD
+	def tog_uload(self, widget, data=None):
+		self.entry1.set_text("upl ") 
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
 
  	def delete_event(self, widget, event, data=None):
 		return gtk.FALSE
@@ -755,7 +827,7 @@ class GUI_foto:
         return #gtk.main_quit()
 
 class ClientFTP(object):
-        """Client FTP da linea di comando (Tutt i comandi posso essere scritti in minuscolo)
+        """Client FTP da linea di comando (Tutti i comandi posso essere scritti in minuscolo)
            Dopo aver avviato servono 'site' 'nick' e 'password' per attivare la 'Connessione'
            Funzioni:               Comandi associati         esempio: 
 
@@ -763,47 +835,47 @@ class ClientFTP(object):
            -Directory remota         RD                        rd     (si vede dove punta)
            -Cambio directory locale  CD                        cd l /nome_da_aggiungere_al_path_di_ld
            -Cambio directory remota  CD                        cd r /nome_da_aggiungere_al_path_di_rd
-           -Lista File               LIST                      list (serve copiare la libreria ftplib.py in ????)
+           -Lista File               LIST                      list
            -Ricerca File             SEARCH                    search nome_file
-           -Rinomina File            REN                       ren nome_file directory nuovo_mome_file
-           -Elimina File             DEL                       del nome_file directory
-           -Download file            DW                        dw directory_remota filename directory_locale_di_uscita(_che può essere omessa)
-           -Download all file        DWA                       dwa directory_remota filename directory_locale_di_uscita(_che può essere omessa)
-           -Invio file               UPL                       upl nome_file directory_remota_di_uscita 
+           -Rinomina File            REN                       ren nome_file dir nuovo_mome_file
+           -Elimina File             DEL                       del nome_file dir
+           -Download file            DW                        dw dir_remota filename dir_locale_di_uscita(_che può essere omessa)
+           -Download all file        DWA                       dwa dir_remota filename dir_locale_di_uscita(_che può essere omessa)
+           -Invio file               UPL                       upl nome_file dir_remota_di_uscita 
                  -
            -Disconnessione           QUIT                      quit
 
             N.B.: DW e UPL cambiano automaticamente le dir di destinazione
                   se differiscono dal puntamento (ld, rd) di prima del comando
         """
-        def __init__(self,site ,nick, pwd):
+        def __init__(self,site ,nick, pswd):
                 self.online = None
                 self.comandi = ['RD', 'LD', 'CD', 'DW','DWA','LIST','SEARCH','REN','DEL','UPL','QUIT','HELP','INFO']
                 self.site = site
                 self.nick = nick
-                self.pwd = pwd
-                self.user = self.connection(self.site,self.nick,self.pwd)
+                self.pswd = pswd
+                self.ftp = self.connection(self.site,self.nick,self.pswd)
                 while self.online:
                     command = raw_input('ClientFTP >>> ')
                     self.controlla_cmd(command)
                 
-        def connection(self,site,nick,pwd):
+        def connection(self,site,nick,pswd):
                 """Comando: None    Parametri: Site, nick, password
                    Compito: Si connette al server alla porta:21 in modalità passiva"""
                 try:
-                        user = ftplib.FTP(site,nick,pwd)
+                        ftp = ftplib.FTP(site,nick,pswd)
                         self.online = True
-                        print user.getwelcome()
-                        return user 
+                        print ftp.getwelcome()
+                        return ftp 
                 except ftplib.all_errors,error:
                         print '[FATAL]Connessione fallita!\n %s' %(error)
                         self.online = False
-                        return None  #self.user = None
+                        return None  #self.ftp = None
                         
         
         def disconnect(self):
                 """Si disconnette dal server e termina il programma"""
-                self.user.quit()
+                self.ftp.quit()
                 self.online = False
                 sys.exit('Programma terminato')
 
@@ -815,15 +887,15 @@ class ClientFTP(object):
         def remote_directory(self):
                 """Comando: RD   Parametri: None
                    Compito: Restituisce informazioni sulla directory remota corrente"""
-                print 'Directory remota corrente: %s' %(self.user.pwd())
+                print 'Directory remota corrente: %s' %(self.ftp.pwd())
         
         def change_directory(self,place,path):
                 """Comando CD Parametri: place (Valori possibili: R,L.R = remoto,L = locale. path(Nome della nuova directory)
                    Compito: Cambio directory """
                 if place.upper() == 'R':
                         try:
-                                self.user.cwd(path)
-                                print 'Directory remota cambiata in : %s' %(self.user.pwd())
+                                self.ftp.cwd(path)
+                                print 'Directory remota cambiata in : %s' %(self.ftp.pswd())
                                 return True
                         except ftplib.all_errors ,e:
                                 print '[!!]%s' %(e) 
@@ -843,7 +915,7 @@ class ClientFTP(object):
                    Compito: Cerca un file"""
                 try:
                         self.change_directory('R',directory)
-                        list_file = self.user.mlsd(facts=['type','size'])
+                        list_file = self.ftp.mlsd(facts=['type','size'])
                         _file=[x for x in list_file if filename in x]
                         if _file == []:
                                 print '[!!]File %s non trovato!' %(filename)
@@ -854,8 +926,8 @@ class ClientFTP(object):
                 except ftplib.error_temp,e:
                         print '[ERROR]%s'%(e)
                         print 'Connessione...'
-                        self.user.connect(self.site)
-                        self.user.login(self.nick,self.pwd)
+                        self.ftp.connect(self.site)
+                        self.ftp.login(self.nick,self.pswd)
                         
                         
         
@@ -866,13 +938,13 @@ class ClientFTP(object):
                 try:
                         if from_all_file:
                                 file_remoto = open(filename,'wb')
-                                self.user.retrbinary('RETR %s' %(str(filename)),file_remoto.write)
+                                self.ftp.retrbinary('RETR %s' %(str(filename)),file_remoto.write)
                                 file_remoto.close()
                                 print 'Scaricato in %s' %(os.getcwd())
                         else:
                                 if self.search_file(filename,directory):
                                         file_remoto = open(filename,'wb')
-                                        self.user.retrbinary('RETR %s' %(str(filename)),file_remoto.write)
+                                        self.ftp.retrbinary('RETR %s' %(str(filename)),file_remoto.write)
                                         file_remoto.close()
                                         print 'Scaricato in %s' %(os.getcwd())
                                 else:
@@ -894,7 +966,7 @@ class ClientFTP(object):
                    Compito: prende tutti i nomi di file di directory_remota e li scarica uno ad uno tramite il metodo download nella cartella d'uscita"""
                 try:
                         self.change_directory('R',directory_remota)
-                        for x in self.user.mlsd(facts = ['type']):
+                        for x in self.ftp.mlsd(facts = ['type']):
                                 if x[1]['type'] == 'file':
                                         self.download(directory_remota, x[0], directory_uscita)
                 except ftplib.error_perm as e:
@@ -905,9 +977,9 @@ class ClientFTP(object):
                 
         def lista_file(self):
                 """Comando: LIST    Parametri: //
-                   Compito: Stampa la lista di file nella directory remota corrente"""
+                   Compito: Stampa la lista di file nella directory remota corrente
                 try:
-                        list_file = self.user.mlsd(facts=['type','size'])
+                        list_file = self.ftp.mlsd(facts=['type','size'])
                         files = []
                         for x in list_file:
                                 files.append(x.strip('),('))
@@ -918,16 +990,16 @@ class ClientFTP(object):
                 except ftplib.error_temp,e:
                         print '[ERROR]%s'%(e)
                         print 'Connessione...'
-                        self.user.connect(self.site)
-                        self.user.login(self.nick,self.pwd)
-
+                        self.ftp.connect(self.site)
+                        self.ftp.login(self.nick,self.pswd)"""
+                self.ftp.retrlines('LIST')
         
         def rename_file(self,filename,directory,nuovoNome):
                 """Comando:REN         Paramentri: filename, directory, nuovoFile
                    Compito:Rinominare un file"""
 
                 if self.search_file(filename,directory):
-                        self.user.rename(filename,nuovoName)
+                        self.ftp.rename(filename,nuovoName)
                         print 'File: %s cambiato in: %s' %(filename,nuovoNome)
                         return True
                 else:
@@ -936,7 +1008,7 @@ class ClientFTP(object):
 
         def delete_file (self,filename,directory):
                 if self.search_file(filename,directory):
-                        self.user.delete(filename)
+                        self.ftp.delete(filename)
                         print 'File %s cancellato!' %(filename)
                 else:
                         print '[!!]File non trovato'
@@ -949,8 +1021,8 @@ class ClientFTP(object):
                 try:
                         self.change_directory('R',directory_uscita)
                         file_locale = open(filename,'rb')
-                        self.user.storbinary('STOR %s' %(str(filename)), file_locale)
-                        print 'File inviato in %s' %(self.user.pwd())
+                        self.ftp.storbinary('STOR %s' %(str(filename)), file_locale)
+                        print 'File inviato in %s' %(self.ftp.pswd())
                 except ftplib.error_perm,e:
                         print '[ERROR] %s' %(e)
                 except IOError,e:
@@ -1029,7 +1101,7 @@ class ClientFTP(object):
                 elif cmd == self.comandi[10]:
                         self.disconnect()
                 elif cmd == self.comandi[11]:
-                        help(Client)
+                        help(ClientFTP)
                 elif cmd == self.comandi[12]:
                         self.info()
 
@@ -1039,6 +1111,7 @@ class Outwin():
         window.set_resizable(True)  
         window.connect("destroy", self.destroy)
         window.set_title("Output dei comandi")
+        window.set_size_request(600, 460)		#dimensione della finestra per 4 button (100,180)
         window.set_border_width(0)
         window.modify_bg(gtk.STATE_NORMAL, giallo)    
 
@@ -1868,9 +1941,9 @@ startMainWin.show_all()
 ######### FTP Client ############################
 #if __name__ == '__main__':
 #        nick = raw_input('Nick:')
-#        pwd = raw_input('Password:')
+#        pswd = raw_input('Password:')
 #        site = raw_input('Sito:')
-#        obj = ClientFTP(site,nick,pwd)
+#        obj = ClientFTP(site,nick,pswd)
 #        while obj.online: #while True
 #                command = raw_input('pyFTP >>> ')
 #                obj.controlla_cmd(command)      
