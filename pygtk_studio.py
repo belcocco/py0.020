@@ -81,7 +81,7 @@ testtext = "Ti sì che te se un hom, minga tò surela!"
 clonetext = "git clone https://github.com/belcocco/py0.020.git &> clone.out" 
 pushtext = "git push https://github.com/belcocco/py0.020.git master &> push.out"
 txt_site_default = "localhost"
-txt_uname_default = "anonymous"
+txt_uname_default = "raga"
 txt_pswd_default = ""
 
 #
@@ -409,13 +409,77 @@ class GUI_git():
 class GUI_ftp():
 	def __init__(self):
 		print "----- GUI_ftp -------"
+
+##########################################
+#		self.labelsite = gtk.Label("Sito Server FTP")
+#		self.labeluname = gtk.Label("Nome Utente")
+#		self.labelpswd = gtk.Label("Password")
+#		fg_color_Att = pango.AttrForeground(65535, 0, 0, 0, 1000)
+#		size_Att = pango.AttrSize(20000, 0, -1)
+#		attr = pango.AttrList()
+#		attr.insert(fg_color_Att)
+#		attr.insert(size_Att)
+#		self.labelsite.set_attributes(attr)
+#		self.labeluname.set_attributes(attr)
+#		self.labelpswd.set_attributes(attr)
+#
+##########################################
+#	#questo frame contiene  la label :"labelcent"
+#		self.frame = gtk.Frame("Elenco delle attività")
+#		self.frame.add(self.labelcent)
+##########################################
+
 		self.win = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.win.set_title("FTP")
-		self.win.set_default_size(600,495)
-		self.win.set_position(gtk.WIN_POS_CENTER)
+		self.win.set_default_size(400,295)
+		self.win.set_position(gtk.WIN_POS_CENTER_ALWAYS)   #CENTER)
 		self.win.set_resizable(gtk.TRUE)
 		self.win.set_border_width(10)
 		self.win.modify_bg(gtk.STATE_NORMAL, carota)
+
+####################### Definizione di tutte le variabili dei box
+#		vboxer = gtk.VBox(False)		
+#		hbox0 = gtk.HBox(False)
+#		hbox1 = gtk.HBox(False)
+#		hbox2 = gtk.HBox(False)
+#		hbox3 = gtk.HBox(False)
+#
+#		vbox0 = gtk.VBox(False)
+#		vbox1 = gtk.VBox(False)
+#
+#	#assegno ai box gli oggetti che devono contenere
+#		vbox0.pack_start(self.frame1, False, False, 5)
+#		vbox.pack_start(self.button4, False, False, 5)
+#		vbox.pack_start(self.button7, False, False, 5)
+#		vbox1.pack_start(self.button2, False, False, 5)
+#		vbox1.pack_start(self.button5, False, False, 5)
+#		vbox1.pack_start(self.button8, False, False, 5)
+#		vbox2.pack_start(self.button3, False, False, 5)
+#		vbox2.pack_start(self.button6, False, False, 5)
+#		vbox2.pack_start(self.button9, False, False, 5)
+#
+#		vbox3.pack_start(self.frame, False, False, 10)
+#
+#		vbox4.pack_start(self.button, False, 1, 10)
+#		vbox5.pack_start(self.but, False, 1, 10)
+#
+#		hbox.pack_start(vbox3, False, False)
+#		hbox1.pack_start(vbox, True, True, 5)
+#		hbox1.pack_start(vbox1, True, True, 5)
+#		hbox1.pack_start(vbox2, 1, 1, 5)
+#		hbox2.pack_start(vbox4, 1,1)
+#		hbox2.pack_start(vbox5, 1,1)
+#		vboxer.pack_start(hbox, True, False)
+#		vboxer.pack_start(hbox1, True,False )
+#		vboxer.pack_start(hbox2, True, False)
+#	
+#	#-----------------------------------------------------------------------
+#	
+#	#aggiungo a win la variabile che contiene tutte le box(vboxer)
+#		self.win.add(vboxer)
+#		self.win.show_all()
+#		
+#######################
 
 		self.win.connect("delete_event", self.delete_event)
 		self.win.connect("destroy", self.destroy)
@@ -425,51 +489,32 @@ class GUI_ftp():
 		self.vbox = gtk.VBox(gtk.TRUE, 10)
 		self.win.add(self.vbox)
 		self.vbox.show()
-#PER ADESSO NESSUN BOTTONE
-#Bottone per inserire l'indirizzo del server FTP remoto (SITE)
-#		self.button_site = gtk.Button("INDIRIZZO SERVER")
-#		self.button_site.connect("clicked", self.tog_site, "Site")
-#		self.vbox.pack_start(self.button_site, gtk.TRUE, gtk.TRUE, 0)
-#Bottone per inserire il nome dell'utenete (default: anonymous)
-#		self.button_uname = gtk.Button("USERNAME")
-#		self.button_uname.connect("clicked", self.tog_uname, "Username")
-#		self.vbox.pack_start(self.button_uname, gtk.TRUE, gtk.TRUE, 0)
-#Bottone per inserire la password per l'accesso (default: none)
-#		self.button_pswd = gtk.Button("PASSWORD")
-#		self.button_pswd.connect("clicked", self.tog_pswd, "Password")
-#		self.vbox.pack_start(self.button_pswd, gtk.TRUE, gtk.TRUE, 0)
-#Bottone per vedere la directory del server FTP remoto
-#		self.button_list = gtk.Button("LIST")
-#		self.button_list.connect("clicked", self.tog_list, "List")
-#		self.vbox.pack_start(self.button_list, gtk.TRUE, gtk.TRUE, 0)
-#Bottone per eseguire il download da server ftp
-#		self.button_dload = gtk.Button("DOWNLOAD")
-#		self.button_dload.connect("clicked", self.tog_dload, "Download")
-#		self.vbox.pack_start(self.button_dload, gtk.TRUE, gtk.TRUE, 0)
-#Bottone per eseguire l'upload verso server ftp
-#		self.button_uload = gtk.Button("UPLOAD")
-#		self.button_uload.connect("clicked", self.tog_uload, "Upload")
-#		self.vbox.pack_start(self.button_uload, gtk.TRUE, gtk.TRUE, 0)
-#ToggleButton per ulteriore attività
-#		self.tog_button_push = gtk.ToggleButton(txt_push)
-#		self.tog_button_push.connect("clicked", self.tog_push, "Upload")
-#		self.vbox.pack_start(self.tog_button_push, gtk.TRUE, gtk.TRUE, 5)
+
 
 #Spazio per controllare l'inserimento del comando indirizzo server
+		self.frame1 = gtk.Frame("Indirizzo del Server FTP")
+		self.vbox.pack_start(self.frame1, gtk.TRUE, gtk.TRUE, 0)
 		self.entry1 = gtk.Entry(100)
 		self.vbox.pack_start(self.entry1, gtk.TRUE, gtk.TRUE, 0)
 #Spazio per per controllare l'inserimento del comando username
+		self.frame2 = gtk.Frame("Nome Utente")
+		self.vbox.pack_start(self.frame2, gtk.TRUE, gtk.TRUE, 0)
 		self.entry2 = gtk.Entry(100)
 		self.vbox.pack_start(self.entry2, gtk.TRUE, gtk.TRUE, 0)
 #Spazio per per controllare l'inserimento del comando password
+		self.frame3 = gtk.Frame("Password")
+		self.vbox.pack_start(self.frame3, gtk.TRUE, gtk.TRUE, 0)
 		self.entry3 = gtk.Entry(100)
 		self.vbox.pack_start(self.entry3, gtk.TRUE, gtk.TRUE, 0)
 #Bottone Esegui
 		self.button_exec = gtk.Button(None, gtk.STOCK_EXECUTE)
 		self.button_exec.connect("clicked", self.exec_ftp_cmd_connessione)
 		self.vbox.pack_start(self.button_exec, gtk.TRUE, gtk.TRUE, 0)
+#Ecco le varie stringe per la connessione
 		self.entry1.set_text(txt_site_default)
 		self.entry2.set_text(txt_uname_default)
+		self.entry3.set_visibility(False)
+		self.entry3.set_invisible_char('@')
 		self.entry3.set_text(txt_pswd_default)
 		
 		self.win.show_all()
@@ -479,9 +524,9 @@ class GUI_ftp():
 		site = self.entry1.get_text()
 		nick = self.entry2.get_text()
 		pswd = self.entry3.get_text()
-		print site
-		print nick
-		print pswd
+#		print site
+#		print nick
+#		print pswd
 #		if CMD_ftp == clonetext: #"git clone https://github.com/belcocco/py0.020.git &> clone.out":
 #			NameFileOut = "clone.out"
 #		elif CMD_ftp == pushtext: #"git push https://github.com/belcocco/py0.020.git master &> push.out":
@@ -492,6 +537,12 @@ class GUI_ftp():
 #################################################
 		ClientFTP(site ,nick, pswd)				#Avvio del client FTP
 #################################################
+
+
+
+
+
+
 #Comando FTP SITE
 	def tog_site(self, widget, data=None):
 		self.entry1.set_text(txt_site_default)
@@ -1280,8 +1331,6 @@ class Attvarwin:		#la classe principale contenete tutte le funzioni
 	
 	self.win.connect("destroy", self.exit)		#assegno al pulsante destroy 
 	self.labelcent = gtk.Label("yum update, ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc.")
-#	self.labelcent = gtk.Label("Questa GTK+/pyGTK")
-#		lbl_clone = gtk.Label(txt_clone)
 	fg_color_Att = pango.AttrForeground(65535, 0, 0, 0, 1000)
 	size_Att = pango.AttrSize(20000, 0, -1)
 	attr = pango.AttrList()
@@ -1294,12 +1343,12 @@ class Attvarwin:		#la classe principale contenete tutte le funzioni
 #--------------------------------------------------------------
 	
 	self.button = gtk.Button(None, gtk.STOCK_QUIT)		#definisce il bottone contenete uno stock item
-	self.button.connect("clicked", self.exit)		#assegna al bottone la funzione di uscita dal programma
+        self.button.connect("clicked", self.exit)		#assegna al bottone la funzione di uscita dal programma
 	gtk.stock_add([(gtk.STOCK_DIALOG_INFO, "Info", 0, 0, "")])   
 	self.but = gtk.Button(None, gtk.STOCK_DIALOG_INFO, True)
-	self.but.connect("clicked", self.info)
+        self.but.connect("clicked", self.info)
 	self.button1 = gtk.Button("button...")		#definisce un altro bottone
-	self.button1.connect("clicked", self.win1)		#assegna al bottone una funzione
+        self.button1.connect("clicked", self.win1)		#assegna al bottone una funzione
 	self.button2 = gtk.Button("toggle,...")		#definisce un altro bottone
         self.button2.connect("clicked", self.win2)		#assegna al bottone una funzione cosi per tutti i bottone fino al segno di commento
 	self.button3 = gtk.Button("label...")
