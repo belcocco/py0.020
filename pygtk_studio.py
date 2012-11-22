@@ -69,11 +69,11 @@ marine = gtk.gdk.color_parse('#0BC7B3')
 giallo = gtk.gdk.color_parse('#FFFF00')
 carota = gtk.gdk.color_parse('#FC9060')
 	#Pango
-fg_color = pango.AttrForeground(65535, 0, 0, 0, 6)
+fg_color = pango.AttrForeground(65565, 0, 0, 0, 6)
 underline = pango.AttrUnderline(pango.UNDERLINE_DOUBLE, 7, 11)
 bg_color = pango.AttrBackground(40000, 40000, 40000, 12, 19)
 strike = pango.AttrStrikethrough(True, 20, 29)
-size = pango.AttrSize(30000, 0, -1)
+size = pango.AttrSize(20000, 0, -1)
 	#Testi vari
 txt_clone = "CLONE"
 txt_push = "PUSH"
@@ -408,27 +408,6 @@ class GUI_git():
 
 class GUI_ftp():
 	def __init__(self):
-		print "----- GUI_ftp -------"
-
-##########################################
-#		self.labelsite = gtk.Label("Sito Server FTP")
-#		self.labeluname = gtk.Label("Nome Utente")
-#		self.labelpswd = gtk.Label("Password")
-#		fg_color_Att = pango.AttrForeground(65535, 0, 0, 0, 1000)
-#		size_Att = pango.AttrSize(20000, 0, -1)
-#		attr = pango.AttrList()
-#		attr.insert(fg_color_Att)
-#		attr.insert(size_Att)
-#		self.labelsite.set_attributes(attr)
-#		self.labeluname.set_attributes(attr)
-#		self.labelpswd.set_attributes(attr)
-#
-##########################################
-#	#questo frame contiene  la label :"labelcent"
-#		self.frame = gtk.Frame("Elenco delle attività")
-#		self.frame.add(self.labelcent)
-##########################################
-
 		self.win = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.win.set_title("FTP")
 		self.win.set_default_size(400,295)
@@ -437,84 +416,65 @@ class GUI_ftp():
 		self.win.set_border_width(10)
 		self.win.modify_bg(gtk.STATE_NORMAL, carota)
 
-####################### Definizione di tutte le variabili dei box
-#		vboxer = gtk.VBox(False)		
-#		hbox0 = gtk.HBox(False)
-#		hbox1 = gtk.HBox(False)
-#		hbox2 = gtk.HBox(False)
-#		hbox3 = gtk.HBox(False)
-#
-#		vbox0 = gtk.VBox(False)
-#		vbox1 = gtk.VBox(False)
-#
-#	#assegno ai box gli oggetti che devono contenere
-#		vbox0.pack_start(self.frame1, False, False, 5)
-#		vbox.pack_start(self.button4, False, False, 5)
-#		vbox.pack_start(self.button7, False, False, 5)
-#		vbox1.pack_start(self.button2, False, False, 5)
-#		vbox1.pack_start(self.button5, False, False, 5)
-#		vbox1.pack_start(self.button8, False, False, 5)
-#		vbox2.pack_start(self.button3, False, False, 5)
-#		vbox2.pack_start(self.button6, False, False, 5)
-#		vbox2.pack_start(self.button9, False, False, 5)
-#
-#		vbox3.pack_start(self.frame, False, False, 10)
-#
-#		vbox4.pack_start(self.button, False, 1, 10)
-#		vbox5.pack_start(self.but, False, 1, 10)
-#
-#		hbox.pack_start(vbox3, False, False)
-#		hbox1.pack_start(vbox, True, True, 5)
-#		hbox1.pack_start(vbox1, True, True, 5)
-#		hbox1.pack_start(vbox2, 1, 1, 5)
-#		hbox2.pack_start(vbox4, 1,1)
-#		hbox2.pack_start(vbox5, 1,1)
-#		vboxer.pack_start(hbox, True, False)
-#		vboxer.pack_start(hbox1, True,False )
-#		vboxer.pack_start(hbox2, True, False)
-#	
-#	#-----------------------------------------------------------------------
-#	
-#	#aggiungo a win la variabile che contiene tutte le box(vboxer)
-#		self.win.add(vboxer)
-#		self.win.show_all()
-#		
-#######################
-
 		self.win.connect("delete_event", self.delete_event)
 		self.win.connect("destroy", self.destroy)
 		self.win.show_all()
 
-############## Inserire i bottoni simili a GUI_git ###########
+############## Inserire gli pggetti
 		self.vbox = gtk.VBox(gtk.TRUE, 10)
 		self.win.add(self.vbox)
 		self.vbox.show()
 
 
-#Spazio per controllare l'inserimento del comando indirizzo server
-		self.frame1 = gtk.Frame("Indirizzo del Server FTP")
+#Label e spazio per controllare l'inserimento del comando indirizzo server
+		self.frame1 = gtk.Frame("")
+		self.labelcent1 = gtk.Label("Sito Server FTP")
+#		fg_color_Att = pango.AttrForeground(65535, 0, 0, 0, 1000)
+#		size_Att = pango.AttrSize(20000, 0, -1)
+		attr = pango.AttrList()
+		attr.insert(fg_color)
+		attr.insert(size)
+		self.labelcent1.set_attributes(attr)
 		self.vbox.pack_start(self.frame1, gtk.TRUE, gtk.TRUE, 0)
+		self.frame1.add(self.labelcent1)
+
 		self.entry1 = gtk.Entry(100)
 		self.vbox.pack_start(self.entry1, gtk.TRUE, gtk.TRUE, 0)
-#Spazio per per controllare l'inserimento del comando username
-		self.frame2 = gtk.Frame("Nome Utente")
+#Label e spazio per per controllare l'inserimento del comando username
+		self.frame2 = gtk.Frame("")
+		self.labelcent2 = gtk.Label("Nome Utente")
+#		fg_color_Att = pango.AttrForeground(65535, 0, 0, 0, 1000)
+#		size_Att = pango.AttrSize(20000, 0, -1)
+		attr = pango.AttrList()
+		attr.insert(fg_color)
+		attr.insert(size)
+		self.labelcent2.set_attributes(attr)
 		self.vbox.pack_start(self.frame2, gtk.TRUE, gtk.TRUE, 0)
+		self.frame2.add(self.labelcent2)
 		self.entry2 = gtk.Entry(100)
 		self.vbox.pack_start(self.entry2, gtk.TRUE, gtk.TRUE, 0)
-#Spazio per per controllare l'inserimento del comando password
-		self.frame3 = gtk.Frame("Password")
+#Label e spazio per per controllare l'inserimento del comando password
+		self.frame3 = gtk.Frame("")
+		self.labelcent3 = gtk.Label("Password")
+#		fg_color_Att = pango.AttrForeground(65535, 0, 0, 0, 1000)
+#		size_Att = pango.AttrSize(20000, 0, -1)
+		attr = pango.AttrList()
+		attr.insert(fg_color)
+		attr.insert(size)
+		self.labelcent3.set_attributes(attr)
 		self.vbox.pack_start(self.frame3, gtk.TRUE, gtk.TRUE, 0)
+		self.frame3.add(self.labelcent3)
 		self.entry3 = gtk.Entry(100)
 		self.vbox.pack_start(self.entry3, gtk.TRUE, gtk.TRUE, 0)
 #Bottone Esegui
 		self.button_exec = gtk.Button(None, gtk.STOCK_EXECUTE)
 		self.button_exec.connect("clicked", self.exec_ftp_cmd_connessione)
 		self.vbox.pack_start(self.button_exec, gtk.TRUE, gtk.TRUE, 0)
-#Ecco le varie stringe per la connessione
+#Visualizza le varie stringe per la connessione
 		self.entry1.set_text(txt_site_default)
 		self.entry2.set_text(txt_uname_default)
 		self.entry3.set_visibility(False)
-		self.entry3.set_invisible_char('@')
+		self.entry3.set_invisible_char('*')
 		self.entry3.set_text(txt_pswd_default)
 		
 		self.win.show_all()
@@ -917,6 +877,9 @@ class ClientFTP(object):
                         ftp = ftplib.FTP(site,nick,pswd)
                         self.online = True
                         print ftp.getwelcome()
+                        Welcome_site = ftp.getwelcome()
+                        OutWelcome_site(Welcome_site)
+
                         return ftp 
                 except ftplib.all_errors,error:
                         print '[FATAL]Connessione fallita!\n %s' %(error)
@@ -1184,14 +1147,169 @@ class Outwin():
         textview.show()
 
         box2.pack_start(sw)
+
         # Carica il file generato dal comando git relativo ai messaggi di errore ecc.
-#        infile = open("clone.out", "r")
+        
         infile = open(NameFileOut, "r")
 
         if infile:
             string = infile.read()
             infile.close()
             textbuffer.set_text(string)
+
+        hbox = gtk.HButtonBox()
+        box2.pack_start(hbox, False, False, 0)
+        hbox.show()
+
+        vbox = gtk.VBox()
+        vbox.show()
+        hbox.pack_start(vbox, False, False, 0)
+        # check button to toggle editable mode
+        check = gtk.CheckButton("Editable")
+        vbox.pack_start(check, False, False, 0)
+        check.connect("toggled", self.toggle_editable, textview)
+        check.set_active(True)
+        check.show()
+        # check button to toggle cursor visiblity
+        check = gtk.CheckButton("Cursor Visible")
+        vbox.pack_start(check, False, False, 0)
+        check.connect("toggled", self.toggle_cursor_visible, textview)
+        check.set_active(True)
+        check.show()
+        # check button to toggle left margin
+        check = gtk.CheckButton("Left Margin")
+        vbox.pack_start(check, False, False, 0)
+        check.connect("toggled", self.toggle_left_margin, textview)
+        check.set_active(False)
+        check.show()
+        # check button to toggle right margin
+        check = gtk.CheckButton("Right Margin")
+        vbox.pack_start(check, False, False, 0)
+        check.connect("toggled", self.toggle_right_margin, textview)
+        check.set_active(False)
+        check.show()
+        # radio buttons to specify wrap mode
+        vbox = gtk.VBox()
+        vbox.show()
+        hbox.pack_start(vbox, False, False, 0)
+        radio = gtk.RadioButton(None, "WRAP__NONE")
+        vbox.pack_start(radio, False, True, 0)
+        radio.connect("toggled", self.new_wrap_mode, textview, gtk.WRAP_NONE)
+        radio.set_active(True)
+        radio.show()
+        radio = gtk.RadioButton(radio, "WRAP__CHAR")
+        vbox.pack_start(radio, False, True, 0)
+        radio.connect("toggled", self.new_wrap_mode, textview, gtk.WRAP_CHAR)
+        radio.show()
+        radio = gtk.RadioButton(radio, "WRAP__WORD")
+        vbox.pack_start(radio, False, True, 0)
+        radio.connect("toggled", self.new_wrap_mode, textview, gtk.WRAP_WORD)
+        radio.show()
+
+        # radio buttons to specify justification
+        vbox = gtk.VBox()
+        vbox.show()
+        hbox.pack_start(vbox, False, False, 0)
+        radio = gtk.RadioButton(None, "JUSTIFY__LEFT")
+        vbox.pack_start(radio, False, True, 0)
+        radio.connect("toggled", self.new_justification, textview,
+                      gtk.JUSTIFY_LEFT)
+        radio.set_active(True)
+        radio.show()
+        radio = gtk.RadioButton(radio, "JUSTIFY__RIGHT")
+        vbox.pack_start(radio, False, True, 0)
+        radio.connect("toggled", self.new_justification, textview,
+                      gtk.JUSTIFY_RIGHT)
+        radio.show()
+        radio = gtk.RadioButton(radio, "JUSTIFY__CENTER")
+        vbox.pack_start(radio, False, True, 0)
+        radio.connect("toggled", self.new_justification, textview,
+                      gtk.JUSTIFY_CENTER)
+        radio.show()
+
+        separator = gtk.HSeparator()
+        box1.pack_start(separator, False, True, 0)
+        separator.show()
+
+        box2 = gtk.VBox(False, 10)
+        box2.set_border_width(10)
+        box1.pack_start(box2, False, True, 0)
+        box2.show()
+
+#        button = gtk.Button("Chiudi")
+#        button.connect("clicked", self.destroy)
+#        box2.pack_start(button, True, True, 0)
+#        button.set_flags(gtk.CAN_DEFAULT)
+#        button.grab_default()
+#        button.show()
+        window.show()
+
+    def toggle_editable(self, checkbutton, textview):
+        textview.set_editable(checkbutton.get_active())
+
+    def toggle_cursor_visible(self, checkbutton, textview):
+        textview.set_cursor_visible(checkbutton.get_active())
+
+    def toggle_left_margin(self, checkbutton, textview):
+        if checkbutton.get_active():
+            textview.set_left_margin(50)
+        else:
+            textview.set_left_margin(0)
+
+    def toggle_right_margin(self, checkbutton, textview):
+        if checkbutton.get_active():
+            textview.set_right_margin(50)
+        else:
+            textview.set_right_margin(0)
+
+    def new_wrap_mode(self, radiobutton, textview, val):
+        if radiobutton.get_active():
+            textview.set_wrap_mode(val)
+
+    def new_justification(self, radiobutton, textview, val):
+        if radiobutton.get_active():
+            textview.set_justification(val)
+
+    def destroy(self, widget):
+        return #gtk.main_quit()
+
+class OutWelcome_site():
+    def __init__(self, Welcome_site):
+        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        window.set_resizable(True)  
+        window.connect("destroy", self.destroy)
+        window.set_title("Connessione attiva con Server FTP")
+        window.set_size_request(600, 460)		#dimensione della finestra per 4 button (100,180)
+        window.set_border_width(0)
+        window.modify_bg(gtk.STATE_NORMAL, giallo)    
+
+        box1 = gtk.VBox(False, 0)
+        window.add(box1)
+        box1.show()
+
+        box2 = gtk.VBox(False, 10)
+        box2.set_border_width(10)
+        box1.pack_start(box2, True, True, 0)
+        box2.show()
+
+        sw = gtk.ScrolledWindow()
+        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        textview = gtk.TextView()
+        textbuffer = textview.get_buffer()
+        sw.add(textview)
+        sw.show()
+        textview.show()
+
+        box2.pack_start(sw)
+
+        # Carica il file generato dal comando git relativo ai messaggi di errore ecc.
+        
+#        infile = open(NameFileOut, "r")
+
+#        if infile:
+        string = Welcome_site
+#            infile.close()
+        textbuffer.set_text(string)
 
         hbox = gtk.HButtonBox()
         box2.pack_start(hbox, False, False, 0)
@@ -1666,7 +1784,7 @@ class Attvarwin:		#la classe principale contenete tutte le funzioni
 	self.entry1lab = gtk.Label("le entry vengono utilizzate per inserire stringhe si richiamo con la funzione gtk.Entry()")
 	self.entry2 = gtk.Entry()
 	self.entry2.set_visibility(False)
-	self.entry2.set_invisible_char('@')
+	self.entry2.set_invisible_char('*')
 	self.entry2lab = gtk.Label("questa entry e uguale a quella sopra solo che non vengono visualizzati i caratteri grazie a gtk.set_invisible_char(char)")
 	self.entry3 = gtk.Entry()
 	self.entry3.set_visibility(False)
@@ -1940,7 +2058,7 @@ class PangoApp1(gtk.Window):
 #        self.connect("destroy", gtk.main_quit)
         self.set_title("Unicode")
         
-        label = gtk.Label(obj.encode('utf-8'))
+        label = gtk.Label(objru.encode('utf-8'))
 
         fontdesc = pango.FontDescription("Georgia 10")
         label.modify_font(fontdesc)
