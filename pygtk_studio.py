@@ -19,29 +19,6 @@
 #
 #Creato da: Belcocco
 #Data:24-10-2012
-#Descrizione: Attributi Pango
-''''class pango.Attribute:
-    def pango.attr_type_register(name)
-    def pango.AttrLanguage(language, start_index=0, end_index=1)
-    def pango.AttrFamily(family, start_index=0, end_index=1)
-    def pango.AttrForeground(red, green, blue, start_index=0, end_index=1)
-    def pango.AttrBackground(red, green, blue, start_index=0, end_index=1)
-    def pango.AttrSize(size, start_index=0, end_index=1)
-    def pango.AttrStyle(style, start_index=0, end_index=1)
-    def pango.AttrWeight(weight, start_index=0, end_index=1)
-    def pango.AttrVariant(variant, start_index=0, end_index=1)
-    def pango.AttrStretch(stretch, start_index=0, end_index=1)
-    def pango.AttrFontDesc(desc, start_index=0, end_index=1)
-    def pango.AttrUnderline(underline, start_index=0, end_index=1)
-    def pango.AttrStrikethrough(strikethrough, start_index=0, end_index=1)
-    def pango.AttrRise(rise, start_index=0, end_index=1)
-    def pango.AttrShape(ink_rect, logical_rect, start_index=0, end_index=1)
-    def pango.AttrScale(scale, start_index=0, end_index=1)
-    def pango.AttrFallback(fallback, start_index=0, end_index=1)
-    def pango.AttrSizeAbsolute(size, start_index=0, end_index=1)
-    def pango.AttrUnderlineColor(red, green, blue, start_index=0, end_index=1)
-    def pango.AttrStrikethroughColor(red, green, blue, start_index=0, end_index=1)
-    def pango.AttrLetterSpacing(letter_spacing, start_index=0, end_index=1)#'''
 #import module
 import pygtk, gtk
 pygtk.require('2.0')
@@ -68,6 +45,7 @@ ocra = gtk.gdk.color_parse('#D6D944')
 marine = gtk.gdk.color_parse('#0BC7B3')
 giallo = gtk.gdk.color_parse('#FFFF00')
 carota = gtk.gdk.color_parse('#FC9060')
+marine = gtk.gdk.color_parse('#2BC4E3')
 	#Pango
 fg_color = pango.AttrForeground(65565, 0, 0, 0, 6)
 underline = pango.AttrUnderline(pango.UNDERLINE_DOUBLE, 7, 11)
@@ -82,7 +60,10 @@ clonetext = "git clone https://github.com/belcocco/py0.020.git &> clone.out"
 pushtext = "git push https://github.com/belcocco/py0.020.git master &> push.out"
 txt_site_default = "localhost"
 txt_uname_default = "raga"
-txt_pswd_default = ""
+txt_pswd_default = "ragamuz"
+#txt_site_default = "na.mirror.garr.it"
+#txt_uname_default = "anonymous"
+#txt_pswd_default = ""
 
 #
 #site = "localhost"
@@ -484,59 +465,20 @@ class GUI_ftp():
 		site = self.entry1.get_text()
 		nick = self.entry2.get_text()
 		pswd = self.entry3.get_text()
-#		print site
-#		print nick
-#		print pswd
-#		if CMD_ftp == clonetext: #"git clone https://github.com/belcocco/py0.020.git &> clone.out":
-#			NameFileOut = "clone.out"
-#		elif CMD_ftp == pushtext: #"git push https://github.com/belcocco/py0.020.git master &> push.out":
-#			NameFileOut = "push.out"
-#		elif NameFileOut != "clone.out" or NameFileOut != "push.out":
-#			NameFileOut = "git.out"
-#		self.entry2.set_text("OK, tutto fatto !")   #Se NON si vede è perchè manca '&' alla fine del comando shell
+
+#ATTIVA LA CONNESSIONE
+		self.site = site
+		self.nick = nick
+		self.pswd = pswd
+#		self.ftp = self.connection(self.site,self.nick,self.pswd)
+
+
+
 #################################################
 		ClientFTP(site ,nick, pswd)				#Avvio del client FTP
 #################################################
 
-
-
-
-
-
-#Comando FTP SITE
-	def tog_site(self, widget, data=None):
-		self.entry1.set_text(txt_site_default)
-		self.entry2.set_text("")
-		self.entry3.set_text("")
-#Comando FTP USERNAME
-	def tog_uname(self, widget, data=None):
-		self.entry1.set_text("anonymous")
-		self.entry2.set_text("")
-		self.entry3.set_text("")
-#Comando FTP PASSWORD
-	def tog_pswd(self, widget, data=None):
-		self.entry1.set_text(txt_pswd_default)  
-		self.entry2.set_text("")
-		self.entry3.set_text("")
-##Comando FTP LIST
-	def tog_list(self, widget, data=None):
-		NameFileOut = "list.out"
-		self.entry1.set_text("list")
-		self.entry2.set_text("")
-		self.entry3.set_text("")
-#Comando FTP DOWNLOAD
-	def tog_dload(self, widget, data=None):
-		self.entry1.set_text("dw")
-		self.entry2.set_text("")
-		self.entry3.set_text("")
-#Comando FTP UPLOAD
-	def tog_uload(self, widget, data=None):
-		self.entry1.set_text("upl ") 
-		self.entry2.set_text("")
-		self.entry3.set_text("")
-		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
-
- 	def delete_event(self, widget, event, data=None):
+	def delete_event(self, widget, event, data=None):
 		return gtk.FALSE
 	def destroy(self, widget, data=None):
 		return #gtk.main_quit()
@@ -1274,158 +1216,156 @@ class Outwin():
         return #gtk.main_quit()
 
 class OutWelcome_site():
-    def __init__(self, Welcome_site):
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.set_resizable(True)  
-        window.connect("destroy", self.destroy)
-        window.set_title("Connessione attiva con Server FTP")
-        window.set_size_request(600, 460)		#dimensione della finestra per 4 button (100,180)
-        window.set_border_width(0)
-        window.modify_bg(gtk.STATE_NORMAL, giallo)    
+	def __init__(self, Welcome_site):
+#Label e spazio per controllare l'inserimento del comando indirizzo server
+		self.win = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		self.win.set_title("Connessione attiva")
+#		self.win.set_default_size(200, 80)
+		self.win.set_size_request(500, 460)		#dimensione della finestra per 4 button (100,180)
+		self.win.set_position(gtk.WIN_POS_CENTER)
+		self.win.set_resizable(gtk.TRUE)
+		self.win.set_border_width(10)
+		self.win.modify_bg(gtk.STATE_NORMAL, marine)    
 
-        box1 = gtk.VBox(False, 0)
-        window.add(box1)
-        box1.show()
+		self.win.connect("delete_event", self.delete_event)
+		self.win.connect("destroy", self.destroy)
 
-        box2 = gtk.VBox(False, 10)
-        box2.set_border_width(10)
-        box1.pack_start(box2, True, True, 0)
-        box2.show()
+#		self.vbox = gtk.VBox()
 
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        textview = gtk.TextView()
-        textbuffer = textview.get_buffer()
-        sw.add(textview)
-        sw.show()
-        textview.show()
+#		self.vbox = gtk.VBox(gtk.TRUE, 3)
+		self.vbox = gtk.VBox(gtk.TRUE, 10)
+		self.win.add(self.vbox)
+		self.vbox.show()
 
-        box2.pack_start(sw)
+#Label e spazio per controllare l'inserimento del comando indirizzo server
+		self.frame1 = gtk.Frame("Il Server è collegato ed ha risposto:")
+		self.labelcent1 = gtk.Label(Welcome_site)
+#		fg_color_Att = pango.AttrForeground(65535, 0, 0, 0, 1000)
+#		size_Att = pango.AttrSize(20000, 0, -1)
+		attr = pango.AttrList()
+		attr.insert(fg_color)
+		attr.insert(size)
+		self.labelcent1.set_attributes(attr)
+		self.vbox.pack_start(self.frame1, gtk.TRUE, gtk.TRUE, 0)
+		self.frame1.add(self.labelcent1)
 
-        # Carica il file generato dal comando git relativo ai messaggi di errore ecc.
-        
-#        infile = open(NameFileOut, "r")
+		self.entry1 = gtk.Entry(100)
+		self.vbox.pack_start(self.entry1, gtk.TRUE, gtk.TRUE, 0)
 
-#        if infile:
-        string = Welcome_site
-#            infile.close()
-        textbuffer.set_text(string)
 
-        hbox = gtk.HButtonBox()
-        box2.pack_start(hbox, False, False, 0)
-        hbox.show()
+#Spazio per controllare l'inserimento del comando 
+		self.entry1 = gtk.Entry(100)
+		self.vbox.pack_start(self.entry1, gtk.TRUE, gtk.TRUE, 0)
 
-        vbox = gtk.VBox()
-        vbox.show()
-        hbox.pack_start(vbox, False, False, 0)
-        # check button to toggle editable mode
-        check = gtk.CheckButton("Editable")
-        vbox.pack_start(check, False, False, 0)
-        check.connect("toggled", self.toggle_editable, textview)
-        check.set_active(True)
-        check.show()
-        # check button to toggle cursor visiblity
-        check = gtk.CheckButton("Cursor Visible")
-        vbox.pack_start(check, False, False, 0)
-        check.connect("toggled", self.toggle_cursor_visible, textview)
-        check.set_active(True)
-        check.show()
-        # check button to toggle left margin
-        check = gtk.CheckButton("Left Margin")
-        vbox.pack_start(check, False, False, 0)
-        check.connect("toggled", self.toggle_left_margin, textview)
-        check.set_active(False)
-        check.show()
-        # check button to toggle right margin
-        check = gtk.CheckButton("Right Margin")
-        vbox.pack_start(check, False, False, 0)
-        check.connect("toggled", self.toggle_right_margin, textview)
-        check.set_active(False)
-        check.show()
-        # radio buttons to specify wrap mode
-        vbox = gtk.VBox()
-        vbox.show()
-        hbox.pack_start(vbox, False, False, 0)
-        radio = gtk.RadioButton(None, "WRAP__NONE")
-        vbox.pack_start(radio, False, True, 0)
-        radio.connect("toggled", self.new_wrap_mode, textview, gtk.WRAP_NONE)
-        radio.set_active(True)
-        radio.show()
-        radio = gtk.RadioButton(radio, "WRAP__CHAR")
-        vbox.pack_start(radio, False, True, 0)
-        radio.connect("toggled", self.new_wrap_mode, textview, gtk.WRAP_CHAR)
-        radio.show()
-        radio = gtk.RadioButton(radio, "WRAP__WORD")
-        vbox.pack_start(radio, False, True, 0)
-        radio.connect("toggled", self.new_wrap_mode, textview, gtk.WRAP_WORD)
-        radio.show()
+#Bottone Esegui
+		self.button_exec = gtk.Button(None, gtk.STOCK_EXECUTE)
+		self.button_exec.connect("clicked", self.exec_git_cmd)
+		self.vbox.pack_start(self.button_exec, gtk.TRUE, gtk.TRUE, 0)
 
-        # radio buttons to specify justification
-        vbox = gtk.VBox()
-        vbox.show()
-        hbox.pack_start(vbox, False, False, 0)
-        radio = gtk.RadioButton(None, "JUSTIFY__LEFT")
-        vbox.pack_start(radio, False, True, 0)
-        radio.connect("toggled", self.new_justification, textview,
-                      gtk.JUSTIFY_LEFT)
-        radio.set_active(True)
-        radio.show()
-        radio = gtk.RadioButton(radio, "JUSTIFY__RIGHT")
-        vbox.pack_start(radio, False, True, 0)
-        radio.connect("toggled", self.new_justification, textview,
-                      gtk.JUSTIFY_RIGHT)
-        radio.show()
-        radio = gtk.RadioButton(radio, "JUSTIFY__CENTER")
-        vbox.pack_start(radio, False, True, 0)
-        radio.connect("toggled", self.new_justification, textview,
-                      gtk.JUSTIFY_CENTER)
-        radio.show()
+#Spazio per gestire l'attività scelta (git clone, add, log, commit e push)
+		self.entry2 = gtk.Entry(100)
+		self.vbox.pack_start(self.entry2, gtk.TRUE, gtk.TRUE, 0)
 
-        separator = gtk.HSeparator()
-        box1.pack_start(separator, False, True, 0)
-        separator.show()
+#Spazio per gestire gli output-errori dell'attività scelta (git clone, add, log, commit e push)
+		self.entry3 = gtk.Entry(100)
+		self.vbox.pack_start(self.entry3, gtk.TRUE, gtk.TRUE, 0)
 
-        box2 = gtk.VBox(False, 10)
-        box2.set_border_width(10)
-        box1.pack_start(box2, False, True, 0)
-        box2.show()
+		self.win.show_all()
 
-#        button = gtk.Button("Chiudi")
-#        button.connect("clicked", self.destroy)
-#        box2.pack_start(button, True, True, 0)
-#        button.set_flags(gtk.CAN_DEFAULT)
-#        button.grab_default()
-#        button.show()
-        window.show()
+#Gestisce l'attività (clone, add, log, commit e push)
+	def exec_git_cmd(self, widget):
+		NameFileOut = ""
+		self.entry2.set_text(" ")
+		self.entry3.set_text(" ")
+		CMD_git = self.entry1.get_text()
+		print CMD_git
+		if CMD_git == clonetext: #"git clone https://github.com/belcocco/py0.020.git &> clone.out":
+			NameFileOut = "clone.out"
+		elif CMD_git == pushtext: #"git push https://github.com/belcocco/py0.020.git master &> push.out":
+			NameFileOut = "push.out"
+		elif NameFileOut != "clone.out" or NameFileOut != "push.out":
+			NameFileOut = "git.out"
+		self.entry2.set_text("OK, tutto fatto !")   #Se NON si vede è perchè manca '&' alla fine del comando shell
 
-    def toggle_editable(self, checkbutton, textview):
-        textview.set_editable(checkbutton.get_active())
+		#Esegui comando della shell. Ciò che FUNZIONA MEGLIO. 
+#		proc = subprocess.check_call(CMD_git, shell=True) #, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+		proc = subprocess.Popen(CMD_git, shell=True) #, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
-    def toggle_cursor_visible(self, checkbutton, textview):
-        textview.set_cursor_visible(checkbutton.get_active())
+		#Aspetta la fine del comando. SOLO POPEN !!!
+		proc.wait()
 
-    def toggle_left_margin(self, checkbutton, textview):
-        if checkbutton.get_active():
-            textview.set_left_margin(50)
-        else:
-            textview.set_left_margin(0)
+########################### DA CANCELLARE #################
+#		k = 0
+#		str1 = ""		#non viene eseguito nessun ciclo FOR. Basta guardare se il file è VUOTO.
+#		str2 = "Cloning into"
+#		str3 = "not found: did you run git"
+#		str4 = "fatal: HTTP request failed"
+#		str5 = "fatal: Authentication failed"
+#		strNR = 0
+#		cmdFind = 'find . -name "clone.out" -print'    # Cerca nel file clone.out
+###########################################################
 
-    def toggle_right_margin(self, checkbutton, textview):
-        if checkbutton.get_active():
-            textview.set_right_margin(50)
-        else:
-            textview.set_right_margin(0)
+		#Guarda se il comando git clone/push .... ha dato errrori
+		print NameFileOut
+		if proc.returncode != 0:
+			self.entry2.set_text("...terminato con ERRORE !")
+			#C'E' ERRORE per INTERNET SCONNESSA, ma esiste già la dir del clonaggio?
+			#Guarda se il file clone.out è vuoto 
+			if os.stat(NameFileOut).st_size == 0:
+				#Errore: il path di destinazione esiste già e non è una directory vuota."
+				self.entry3.set_text("..terminato con ERRORE e con OUTPUT VUOTO (???)")
+		elif CMD_git == clonetext:
+			self.entry3.set_text("Clone eseguito con SUCCESSO in LOCALE")
+		elif CMD_git == pushtext:
+			self.entry3.set_text("Push eseguito con SUCCESSO sul repository di GITHUB")
+#		if NameFileOut != "":
+		Outwin(NameFileOut)	#Visualizzazione della finestra degli output del comando git
+		print proc.returncode
+		
+#Comando GIT CLONE
+	def tog_clone(self, widget, data=None):
+#		NameFileOut = "clone.out"
+		self.entry1.set_text(clonetext) #"git clone https://github.com/belcocco/py0.020.git &> clone.out")
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
+#Comando GIT ADD
+	def tog_add(self, widget, data=None):
+#		NameFileOut = "git.out"
+		self.entry1.set_text("git add * &> git.out")
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+#Comando GIT STATUS
+	def tog_status(self, widget, data=None):
+#		NameFileOut = "git.out"
+		self.entry1.set_text("git status &> git.out")
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+##Comando GIT LOG
+	def tog_log(self, widget, data=None):
+#		NameFileOut = "git.out"
+		self.entry1.set_text("git log | grep studio &> git.out")
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+#Comando GIT COMMIT
+	def tog_commit(self, widget, data=None):
+#		NameFileOut = "git.out"
+		self.entry1.set_text("git commit -m ----- &> git.out")
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+#Comando GIT PUSH
+	def tog_push(self, widget, data=None):
+#		NameFileOut = "push.out"
+		self.entry1.set_text(pushtext) #"git push https://github.com/belcocco/py0.020.git &> push.out")
+		self.entry2.set_text("")
+		self.entry3.set_text("")
+		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
 
-    def new_wrap_mode(self, radiobutton, textview, val):
-        if radiobutton.get_active():
-            textview.set_wrap_mode(val)
-
-    def new_justification(self, radiobutton, textview, val):
-        if radiobutton.get_active():
-            textview.set_justification(val)
-
-    def destroy(self, widget):
-        return #gtk.main_quit()
+	
+	def delete_event(self, widget, event, data=None):
+		return gtk.FALSE
+	def destroy(self, widget, data=None):
+		return #gtk.main_quit()
 
 class Attvarwin:		#la classe principale contenete tutte le funzioni
     def __init__(self):		#la funzione principale della classe
