@@ -77,7 +77,26 @@ objru = unicode(u'''Фёдор Михайлович Достоевский ро�
 1821 года в Москве. Был вторым из 7 детей. Отец, Михаил Андреевич, 
 работал вгоспитале для бедных. Мать, Мария Фёдоровна 
 (в девичестве Нечаева), происходила из купеческого рода.''')
+ftp_help = unicode(u"""Client FTP da linea di comando (Tutti i comandi posso essere scritti in minuscolo)
+           Dopo aver avviato servono 'site' 'nick' e 'password' per attivare la 'Connessione'
+           Funzioni:               Comandi associati         esempio: 
 
+           -Directory locale         LD                        ld     (si vede dove punta)
+           -Directory remota         RD                        rd     (si vede dove punta)
+           -Cambio directory locale  CD                        cd l /nome_da_aggiungere_al_path_di_ld
+           -Cambio directory remota  CD                        cd r /nome_da_aggiungere_al_path_di_rd
+           -Lista File               LIST                      list
+           -Ricerca File             SEARCH                    search nome_file
+           -Rinomina File            REN                       ren nome_file dir nuovo_mome_file
+           -Elimina File             DEL                       del nome_file dir
+           -Download file            DW                        dw dir_remota filename dir_locale_di_uscita(_che può essere omessa)
+           -Download all file        DWA                       dwa dir_remota filename dir_locale_di_uscita(_che può essere omessa)
+           -Invio file               UPL                       upl nome_file dir_remota_di_uscita 
+                 -
+           -Disconnessione           QUIT                      quit
+
+            N.B.: DW e UPL cambiano automaticamente le dir di destinazione
+                  se differiscono dal puntamento (ld, rd) di prima del comando.""")
 #Finestra principale con tutti i bottoni delle attività
 class MainWin(gtk.Window):
     def __init__(self):
@@ -449,8 +468,9 @@ class GUI_ftp():
 		self.vbox.pack_start(self.entry3, gtk.TRUE, gtk.TRUE, 0)
 #Bottone Esegui
 		self.button_exec = gtk.Button(None, gtk.STOCK_EXECUTE)
-		self.button_exec.connect("clicked", self.exec_ftp_cmd_connessione)
+		self.button_exec.connect("clicked", self.prova_connessione)
 		self.vbox.pack_start(self.button_exec, gtk.TRUE, gtk.TRUE, 0)
+
 #Visualizza le varie stringe per la connessione
 		self.entry1.set_text(txt_site_default)
 		self.entry2.set_text(txt_uname_default)
@@ -460,23 +480,38 @@ class GUI_ftp():
 		
 		self.win.show_all()
 
-#Gestisce l'attività (ClientFTP)
-	def exec_ftp_cmd_connessione(self, widget):
-		site = self.entry1.get_text()
-		nick = self.entry2.get_text()
-		pswd = self.entry3.get_text()
+	def prova_connessione(self, widget):
+		self.online = None
+#		self.comandi = ['RD', 'LD', 'CD', 'DW','DWA','LIST','SEARCH','REN','DEL','UPL','QUIT','HELP','INFO']
+		self.site = self.entry1.get_text()
+		self.nick = self.entry2.get_text()
+		self.pswd = self.entry3.get_text()
+		self.ftp = self.connessione(self.site,self.nick,self.pswd)
+#		self.online = None
+#		self.comandi = ['RD', 'LD', 'CD', 'DW','DWA','LIST','SEARCH','REN','DEL','UPL','QUIT','HELP','INFO']
+#		while self.online:
+#			Comandi_FTP(Welcome_site) # Su questa classe c'è TUTTO il peso del ClientFTL
+#			print "CICCIA"
+			
+	def connessione(self,site,nick,pswd):
+		"""Comando: None    Parametri: Site, nick, password
+		Compito: Si connette al server alla porta:21 in modalità passiva"""
+		try:
+			ftp = ftplib.FTP(site,nick,pswd)
+			Errore_connessione = False 
+			self.online = True
+			print ftp.getwelcome()
+			Stato_server = ftp.getwelcome()
+			Comandi_FTP(Stato_server, Errore_connessione)
 
-#ATTIVA LA CONNESSIONE
-		self.site = site
-		self.nick = nick
-		self.pswd = pswd
-#		self.ftp = self.connection(self.site,self.nick,self.pswd)
-
-
-
-#################################################
-		ClientFTP(site ,nick, pswd)				#Avvio del client FTP
-#################################################
+			return ftp 
+		except ftplib.all_errors,error:
+			Errore_connessione = True
+			Stato_server = "[FATAL ERROR]Connessione fallita!"
+			Comandi_FTP(Stato_server, Errore_connessione)
+			print '[FATAL ERROR]Connessione fallita!\n %s ' %(error)
+			self.online = False
+			return None  #self.ftp = None
 
 	def delete_event(self, widget, event, data=None):
 		return gtk.FALSE
@@ -779,288 +814,6 @@ class GUI_foto:
     def destroy(self, widget, data=None):
         return #gtk.main_quit()
 
-class ClientFTP(object):
-        """Client FTP da linea di comando (Tutti i comandi posso essere scritti in minuscolo)
-           Dopo aver avviato servono 'site' 'nick' e 'password' per attivare la 'Connessione'
-           Funzioni:               Comandi associati         esempio: 
-
-           -Directory locale         LD                        ld     (si vede dove punta)
-           -Directory remota         RD                        rd     (si vede dove punta)
-           -Cambio directory locale  CD                        cd l /nome_da_aggiungere_al_path_di_ld
-           -Cambio directory remota  CD                        cd r /nome_da_aggiungere_al_path_di_rd
-           -Lista File               LIST                      list
-           -Ricerca File             SEARCH                    search nome_file
-           -Rinomina File            REN                       ren nome_file dir nuovo_mome_file
-           -Elimina File             DEL                       del nome_file dir
-           -Download file            DW                        dw dir_remota filename dir_locale_di_uscita(_che può essere omessa)
-           -Download all file        DWA                       dwa dir_remota filename dir_locale_di_uscita(_che può essere omessa)
-           -Invio file               UPL                       upl nome_file dir_remota_di_uscita 
-                 -
-           -Disconnessione           QUIT                      quit
-
-            N.B.: DW e UPL cambiano automaticamente le dir di destinazione
-                  se differiscono dal puntamento (ld, rd) di prima del comando
-        """
-        def __init__(self,site ,nick, pswd):
-                self.online = None
-                self.comandi = ['RD', 'LD', 'CD', 'DW','DWA','LIST','SEARCH','REN','DEL','UPL','QUIT','HELP','INFO']
-                self.site = site
-                self.nick = nick
-                self.pswd = pswd
-                self.ftp = self.connection(self.site,self.nick,self.pswd)
-                while self.online:
-                    command = raw_input('ClientFTP >>> ')
-                    self.controlla_cmd(command)
-                
-        def connection(self,site,nick,pswd):
-                """Comando: None    Parametri: Site, nick, password
-                   Compito: Si connette al server alla porta:21 in modalità passiva"""
-                try:
-                        ftp = ftplib.FTP(site,nick,pswd)
-                        self.online = True
-                        print ftp.getwelcome()
-                        Welcome_site = ftp.getwelcome()
-                        OutWelcome_site(Welcome_site)
-
-                        return ftp 
-                except ftplib.all_errors,error:
-                        print '[FATAL]Connessione fallita!\n %s' %(error)
-                        self.online = False
-                        return None  #self.ftp = None
-                        
-        
-        def disconnect(self):
-                """Si disconnette dal server e termina il programma"""
-                self.ftp.quit()
-                self.online = False
-                sys.exit('Programma terminato')
-
-        def local_directory(self):
-                """Comando: LD    Parametri: None
-                   Computo: restiruisce informazioni sulla directory locale corrente"""
-                print 'Direcory locale corrente: %s' %(os.getcwd())
-        
-        def remote_directory(self):
-                """Comando: RD   Parametri: None
-                   Compito: Restituisce informazioni sulla directory remota corrente"""
-                print 'Directory remota corrente: %s' %(self.ftp.pwd())
-        
-        def change_directory(self,place,path):
-                """Comando CD Parametri: place (Valori possibili: R,L.R = remoto,L = locale. path(Nome della nuova directory)
-                   Compito: Cambio directory """
-                if place.upper() == 'R':
-                        try:
-                                self.ftp.cwd(path)
-                                print 'Directory remota cambiata in : %s' %(self.ftp.pswd())
-                                return True
-                        except ftplib.all_errors ,e:
-                                print '[!!]%s' %(e) 
-                elif place.upper() == 'L':
-                        try:
-                                os.chdir(path)
-                                print 'Directory locale cambiata in: %s' %(os.getcwd())
-                                return True
-                        except os.error,e:
-                                print '[!!]%s' %(e) 
-                else:
-                        print 'Error, place non supportato!\nPlace supportati: R,L\nR = remote\nL = local'
-                        return False
-
-        def search_file(self,filename,directory):
-                """Comando: Search        Parametri: filename, directory
-                   Compito: Cerca un file"""
-                try:
-                        self.change_directory('R',directory)
-                        list_file = self.ftp.mlsd(facts=['type','size'])
-                        _file=[x for x in list_file if filename in x]
-                        if _file == []:
-                                print '[!!]File %s non trovato!' %(filename)
-                                return False
-                        else:
-                                print _file
-                                return True
-                except ftplib.error_temp,e:
-                        print '[ERROR]%s'%(e)
-                        print 'Connessione...'
-                        self.ftp.connect(self.site)
-                        self.ftp.login(self.nick,self.pswd)
-                        
-                        
-        
-        def download(self,directory,filename,directory_uscita = os.getcwd(),from_all_file = False):
-                """Comando: DW  Parametri: Directory(Directory  remota del file), filename(nome del file remoto), directory_uscita(Directory locale dove verrà salvato il file.
-                                                                                                                    il valore predefinito è la directory corrente)
-                   Compito: Scarica un file dal server"""
-                try:
-                        if from_all_file:
-                                file_remoto = open(filename,'wb')
-                                self.ftp.retrbinary('RETR %s' %(str(filename)),file_remoto.write)
-                                file_remoto.close()
-                                print 'Scaricato in %s' %(os.getcwd())
-                        else:
-                                if self.search_file(filename,directory):
-                                        file_remoto = open(filename,'wb')
-                                        self.ftp.retrbinary('RETR %s' %(str(filename)),file_remoto.write)
-                                        file_remoto.close()
-                                        print 'Scaricato in %s' %(os.getcwd())
-                                else:
-                                        print '[!!]File %s non trovato!' %(filename)
-                except ftplib.error_perm as e:
-                        file_remoto.close()
-                        print '[ERROR] %s' %(e) #Error 500-599
-                        os.remove(filename)
-                        print 'Download interrotto'
-                except IOError as e:
-                        print '[ERROR]%s' %(e)
-                        print '[!!]Sintassi corretta del comando DW: DW directory_remoto file_remoto directory_uscita esempio: DW / favicon.ico C:\Users\normal_user\Desktop'
-                        print 'Per maggiori informazioni usare il comando HELP'
-                        
-                    
-        def download_all_file(self,directory_remota,directory_uscita = os.getcwd()):
-                """Comando: DWA Parametri: directory_remota, directory_uscita
-
-                   Compito: prende tutti i nomi di file di directory_remota e li scarica uno ad uno tramite il metodo download nella cartella d'uscita"""
-                try:
-                        self.change_directory('R',directory_remota)
-                        for x in self.ftp.mlsd(facts = ['type']):
-                                if x[1]['type'] == 'file':
-                                        self.download(directory_remota, x[0], directory_uscita)
-                except ftplib.error_perm as e:
-                        print '[ERROR] %s' %(e) #Error 500-599
-                except ftplib.error_temp as e:
-                        print '[ERROR] %s' %(e) #Error 400-499
-                        
-                
-        def lista_file(self):
-                """Comando: LIST    Parametri: //
-                   Compito: Stampa la lista di file nella directory remota corrente
-                try:
-                        list_file = self.ftp.mlsd(facts=['type','size'])
-                        files = []
-                        for x in list_file:
-                                files.append(x.strip('),('))
-                        for x in files:
-                                print x
-                                print
-                                
-                except ftplib.error_temp,e:
-                        print '[ERROR]%s'%(e)
-                        print 'Connessione...'
-                        self.ftp.connect(self.site)
-                        self.ftp.login(self.nick,self.pswd)"""
-                self.ftp.retrlines('LIST')
-        
-        def rename_file(self,filename,directory,nuovoNome):
-                """Comando:REN         Paramentri: filename, directory, nuovoFile
-                   Compito:Rinominare un file"""
-
-                if self.search_file(filename,directory):
-                        self.ftp.rename(filename,nuovoName)
-                        print 'File: %s cambiato in: %s' %(filename,nuovoNome)
-                        return True
-                else:
-                        print '[!!]Nessuna corrispondenza trovata!'
-                        return False
-
-        def delete_file (self,filename,directory):
-                if self.search_file(filename,directory):
-                        self.ftp.delete(filename)
-                        print 'File %s cancellato!' %(filename)
-                else:
-                        print '[!!]File non trovato'
-                        
-                
-        def upload(self,filename,directory_uscita):
-                """Comando: UPL    Parametri: nameFile(Nome del file con relativo percorso), directory_uscita(Directory remota di uscita.
-                   Compito: Invia un file al server                                          Il valore predefinito è la directory remota corrente).
-                 """
-                try:
-                        self.change_directory('R',directory_uscita)
-                        file_locale = open(filename,'rb')
-                        self.ftp.storbinary('STOR %s' %(str(filename)), file_locale)
-                        print 'File inviato in %s' %(self.ftp.pswd())
-                except ftplib.error_perm,e:
-                        print '[ERROR] %s' %(e)
-                except IOError,e:
-                        print '[ERROR]%s' %(e)
-                        print '[!!]Sintassi corretta del comando UPL: UPL  file_remoto directory_uscita esempio: UPL  favicon.ico C:\Users\normal_user\Desktop\Eggs'
-        
-        def controlla_cmd(self,comando):
-                """Controlla se il  comando è valido"""
-                comando = comando.split()
-                comando_trovato = False
-                for x in comando:
-                        if x.upper() in self.comandi:
-                                comando_trovato = True
-                                cmd = x.upper()
-                                self.avvia_cmd(cmd,[y for y in comando if y != x])
-                                break
-                        else:
-                                continue
-                if not comando_trovato:
-                        print 'Usare help per una lista completa dei comandi'
-
-                
-        def avvia_cmd(self,cmd, argv):
-                """Avvia il comando passato come parametro"""
-                argv =  list(argv)
-                numero_parametri = len(argv)
-                if cmd == self.comandi[0]:
-                        self.remote_directory()
-                elif cmd == self.comandi[1]:
-                        self.local_directory()
-                elif cmd == self.comandi[2]:
-                        if numero_parametri < 2:
-                                print '[ERROR]Parametri insufficenti!\nSintassi corretta: CD R NomeDirectory. CD L NomeDirectory.R=remote, L = Local.\nPer maggiori info usare il comando HELP\n'
-                                return False
-                        else:
-                                self.change_directory(argv[0],argv[1])
-                elif cmd == self.comandi[3]:
-                        if numero_parametri < 2:
-                                print '[ERROR]Parametri non sufficienti'
-                                return False
-                        elif numero_parametri < 3:
-                                print '[!!]Attenzione non è stata specificata la directory di uscita.Il file verrà salvato nelle directory corrente'
-                                self.download(argv[0],argv[1])                                
-                        else:
-                                self.download(argv[0],argv[1],argv[2])
-                elif cmd == self.comandi[4]:
-                        if numero_parametri < 1:
-                                print '[ERROR]Parametri non sufficienti'
-                        elif numero_parametri < 2:
-                                print '[!!]Attenzione non è stata specificata la directory di uscita.I files verranno salvati nelle directory corrente'
-                                self.download_all_file(argv[0])
-                        else:
-                                self.download_all_file(argv[0],argv[1])
-                elif cmd == self.comandi[5]:
-                        self.lista_file()
-                elif cmd == self.comandi[6]:
-                        if numero_parametri < 2:
-                                print '[ERROR]Parametri non sufficienti'
-                        else:
-                                self.search_file(argv[0],argv[1])
-                elif cmd == self.comandi[7]:
-                        if numero_parametri < 3:
-                                print '[ERROR]Parametri non sufficienti'
-                        else:
-                                self.rename_file(argv[0],argv[1],argv[2])
-                elif cmd ==  self.comandi[8]:
-                        if numero_parametri < 2:
-                                print'[ERROR]Parametri non sufficienti'
-                        else:
-                                self.delete_file(argv[0],argv[1])
-                elif cmd == self.comandi[9]:                                        
-                        if numero_parametri < 2:
-                                print '[ERROR]Parametri non sufficienti'
-                        else:
-                                self.upload(argv[0],argv[1])
-                elif cmd == self.comandi[10]:
-                        self.disconnect()
-                elif cmd == self.comandi[11]:
-                        help(ClientFTP)
-                elif cmd == self.comandi[12]:
-                        self.info()
-
 class Outwin():
     def __init__(self, NameFileOut):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -1215,11 +968,13 @@ class Outwin():
     def destroy(self, widget):
         return #gtk.main_quit()
 
-class OutWelcome_site():
-	def __init__(self, Welcome_site):
+class Comandi_FTP(): 
+	#Stato_server = stringa di welcome oppure stringa d'errore
+	#Errore_connessione = TRUE (se c'è errore) oppure FALSE (se non c'è)
+	def __init__(self, Stato_server, Errore_connessione):  
 #Label e spazio per controllare l'inserimento del comando indirizzo server
 		self.win = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.win.set_title("Connessione attiva")
+		self.win.set_title("Connessione FTP")
 #		self.win.set_default_size(200, 80)
 		self.win.set_size_request(500, 460)		#dimensione della finestra per 4 button (100,180)
 		self.win.set_position(gtk.WIN_POS_CENTER)
@@ -1237,9 +992,13 @@ class OutWelcome_site():
 		self.win.add(self.vbox)
 		self.vbox.show()
 
-#Label e spazio per controllare l'inserimento del comando indirizzo server
-		self.frame1 = gtk.Frame("Il Server è collegato ed ha risposto:")
-		self.labelcent1 = gtk.Label(Welcome_site)
+#Frame con la risposta del server a connessione avvenuta
+		if Errore_connessione == False:
+			self.frame1 = gtk.Frame("Il Server è collegato ed ha risposto:")
+		else:
+			self.frame1 = gtk.Frame("Il Server NON risponde")
+		
+		self.labelcent1 = gtk.Label(Stato_server)
 #		fg_color_Att = pango.AttrForeground(65535, 0, 0, 0, 1000)
 #		size_Att = pango.AttrSize(20000, 0, -1)
 		attr = pango.AttrList()
@@ -1249,8 +1008,9 @@ class OutWelcome_site():
 		self.vbox.pack_start(self.frame1, gtk.TRUE, gtk.TRUE, 0)
 		self.frame1.add(self.labelcent1)
 
-		self.entry1 = gtk.Entry(100)
-		self.vbox.pack_start(self.entry1, gtk.TRUE, gtk.TRUE, 0)
+#Spazio entry0 di riserva
+#		self.entry0 = gtk.Entry(100)
+#		self.vbox.pack_start(self.entry0, gtk.TRUE, gtk.TRUE, 0)
 
 
 #Spazio per controllare l'inserimento del comando 
@@ -1258,110 +1018,276 @@ class OutWelcome_site():
 		self.vbox.pack_start(self.entry1, gtk.TRUE, gtk.TRUE, 0)
 
 #Bottone Esegui
-		self.button_exec = gtk.Button(None, gtk.STOCK_EXECUTE)
-		self.button_exec.connect("clicked", self.exec_git_cmd)
-		self.vbox.pack_start(self.button_exec, gtk.TRUE, gtk.TRUE, 0)
+		self.button_exec_ftp_cmd = gtk.Button(None, gtk.STOCK_EXECUTE)
+		self.button_exec_ftp_cmd.connect("clicked", self.exec_ftp_cmd)
+		self.vbox.pack_start(self.button_exec_ftp_cmd, gtk.TRUE, gtk.TRUE, 0)
 
-#Spazio per gestire l'attività scelta (git clone, add, log, commit e push)
+#Spazio per gestire una attività (RISERVA)
 		self.entry2 = gtk.Entry(100)
 		self.vbox.pack_start(self.entry2, gtk.TRUE, gtk.TRUE, 0)
 
-#Spazio per gestire gli output-errori dell'attività scelta (git clone, add, log, commit e push)
+#Spazio per gestire una attività (RISERVA)
 		self.entry3 = gtk.Entry(100)
 		self.vbox.pack_start(self.entry3, gtk.TRUE, gtk.TRUE, 0)
 
+#Visualizza prompt: ClientFTP>>>
+		self.entry1.set_text("ClientFTP>>>")
 		self.win.show_all()
 
-#Gestisce l'attività (clone, add, log, commit e push)
-	def exec_git_cmd(self, widget):
-		NameFileOut = ""
-		self.entry2.set_text(" ")
-		self.entry3.set_text(" ")
-		CMD_git = self.entry1.get_text()
-		print CMD_git
-		if CMD_git == clonetext: #"git clone https://github.com/belcocco/py0.020.git &> clone.out":
-			NameFileOut = "clone.out"
-		elif CMD_git == pushtext: #"git push https://github.com/belcocco/py0.020.git master &> push.out":
-			NameFileOut = "push.out"
-		elif NameFileOut != "clone.out" or NameFileOut != "push.out":
-			NameFileOut = "git.out"
-		self.entry2.set_text("OK, tutto fatto !")   #Se NON si vede è perchè manca '&' alla fine del comando shell
 
-		#Esegui comando della shell. Ciò che FUNZIONA MEGLIO. 
-#		proc = subprocess.check_call(CMD_git, shell=True) #, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-		proc = subprocess.Popen(CMD_git, shell=True) #, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+#Gestisce i comandi 
+	def exec_ftp_cmd(self, widget):
+		self.online = True
+		self.comandi = ['RD', 'LD', 'CD', 'DW','DWA','LIST','SEARCH','REN','DEL','UPL','QUIT','HELP','INFO']
+		print "BoH"
+		while self.online:
+#			command = raw_input('ClientFTP >>> ')
+			command = self.entry1.get_text()
+			print "PAPERA"
+			self.controlla_cmd(command)
+			
 
-		#Aspetta la fine del comando. SOLO POPEN !!!
-		proc.wait()
 
-########################### DA CANCELLARE #################
-#		k = 0
-#		str1 = ""		#non viene eseguito nessun ciclo FOR. Basta guardare se il file è VUOTO.
-#		str2 = "Cloning into"
-#		str3 = "not found: did you run git"
-#		str4 = "fatal: HTTP request failed"
-#		str5 = "fatal: Authentication failed"
-#		strNR = 0
-#		cmdFind = 'find . -name "clone.out" -print'    # Cerca nel file clone.out
-###########################################################
+############################################################################
+#		NameFileOut = ""
+#		self.entry2.set_text(" ")
+#		self.entry3.set_text(" ")
+############################################################################                        
+        
+	def disconnect(self):
+		"""Si disconnette dal server e termina il programma"""
+		self.ftp.quit()
+		self.online = False
+		sys.exit('Programma terminato')
 
-		#Guarda se il comando git clone/push .... ha dato errrori
-		print NameFileOut
-		if proc.returncode != 0:
-			self.entry2.set_text("...terminato con ERRORE !")
-			#C'E' ERRORE per INTERNET SCONNESSA, ma esiste già la dir del clonaggio?
-			#Guarda se il file clone.out è vuoto 
-			if os.stat(NameFileOut).st_size == 0:
-				#Errore: il path di destinazione esiste già e non è una directory vuota."
-				self.entry3.set_text("..terminato con ERRORE e con OUTPUT VUOTO (???)")
-		elif CMD_git == clonetext:
-			self.entry3.set_text("Clone eseguito con SUCCESSO in LOCALE")
-		elif CMD_git == pushtext:
-			self.entry3.set_text("Push eseguito con SUCCESSO sul repository di GITHUB")
-#		if NameFileOut != "":
-		Outwin(NameFileOut)	#Visualizzazione della finestra degli output del comando git
-		print proc.returncode
-		
-#Comando GIT CLONE
-	def tog_clone(self, widget, data=None):
-#		NameFileOut = "clone.out"
-		self.entry1.set_text(clonetext) #"git clone https://github.com/belcocco/py0.020.git &> clone.out")
-		self.entry2.set_text("")
-		self.entry3.set_text("")
-		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
-#Comando GIT ADD
-	def tog_add(self, widget, data=None):
-#		NameFileOut = "git.out"
-		self.entry1.set_text("git add * &> git.out")
-		self.entry2.set_text("")
-		self.entry3.set_text("")
-#Comando GIT STATUS
-	def tog_status(self, widget, data=None):
-#		NameFileOut = "git.out"
-		self.entry1.set_text("git status &> git.out")
-		self.entry2.set_text("")
-		self.entry3.set_text("")
-##Comando GIT LOG
-	def tog_log(self, widget, data=None):
-#		NameFileOut = "git.out"
-		self.entry1.set_text("git log | grep studio &> git.out")
-		self.entry2.set_text("")
-		self.entry3.set_text("")
-#Comando GIT COMMIT
-	def tog_commit(self, widget, data=None):
-#		NameFileOut = "git.out"
-		self.entry1.set_text("git commit -m ----- &> git.out")
-		self.entry2.set_text("")
-		self.entry3.set_text("")
-#Comando GIT PUSH
-	def tog_push(self, widget, data=None):
-#		NameFileOut = "push.out"
-		self.entry1.set_text(pushtext) #"git push https://github.com/belcocco/py0.020.git &> push.out")
-		self.entry2.set_text("")
-		self.entry3.set_text("")
-		print "%s e' ora %s" % (data, ("OFF", "ON")[widget.get_active()])
+	def local_directory(self):
+ 		"""Comando: LD    Parametri: None
+		Computo: restiruisce informazioni sulla directory locale corrente"""
+		print 'Direcory locale corrente: %s' %(os.getcwd())
+        
+	def remote_directory(self):
+		"""Comando: RD   Parametri: None
+		Compito: Restituisce informazioni sulla directory remota corrente"""
+		print 'Directory remota corrente: %s' %(self.ftp.pwd())
+        
+	def change_directory(self,place,path):
+		"""Comando CD Parametri: place (Valori possibili: R,L.R = remoto,L = locale. path(Nome della nuova directory)
+		Compito: Cambio directory """
+		if place.upper() == 'R':
+			try:
+				self.ftp.cwd(path)
+				print 'Directory remota cambiata in : %s' %(self.ftp.pswd())
+				return True
+			except ftplib.all_errors ,e:
+				print '[!!]%s' %(e) 
+		elif place.upper() == 'L':
+			try:
+				os.chdir(path)
+				print 'Directory locale cambiata in: %s' %(os.getcwd())
+				return True
+			except os.error,e:
+				print '[!!]%s' %(e) 
+		else:
+			print 'Error, place non supportato!\nPlace supportati: R,L\nR = remote\nL = local'
+			return False
 
-	
+	def search_file(self,filename,directory):
+		"""Comando: Search        Parametri: filename, directory
+		Compito: Cerca un file"""
+		try:
+			self.change_directory('R',directory)
+			list_file = self.ftp.mlsd(facts=['type','size'])
+			_file=[x for x in list_file if filename in x]
+			if _file == []:
+				print '[!!]File %s non trovato!' %(filename)
+				return False
+			else:
+				print _file
+				return True
+		except ftplib.error_temp,e:
+				print '[ERROR]%s'%(e)
+				print 'Connessione...'
+				self.ftp.connect(self.site)
+				self.ftp.login(self.nick,self.pswd)
+                        
+                        
+        
+	def download(self,directory,filename,directory_uscita = os.getcwd(),from_all_file = False):
+		"""Comando: DW  Parametri: Directory(Directory  remota del file), filename(nome del file remoto), directory_uscita(Directory locale dove verrà salvato il file.
+		il valore predefinito è la directory corrente)
+		Compito: Scarica un file dal server"""
+		try:
+			if from_all_file:
+				file_remoto = open(filename,'wb')
+				self.ftp.retrbinary('RETR %s' %(str(filename)),file_remoto.write)
+				file_remoto.close()
+				print 'Scaricato in %s' %(os.getcwd())
+			else:
+				if self.search_file(filename,directory):
+					file_remoto = open(filename,'wb')
+					self.ftp.retrbinary('RETR %s' %(str(filename)),file_remoto.write)
+					file_remoto.close()
+					print 'Scaricato in %s' %(os.getcwd())
+				else:
+					print '[!!]File %s non trovato!' %(filename)
+		except ftplib.error_perm as e:
+			file_remoto.close()
+			print '[ERROR] %s' %(e) #Error 500-599
+			os.remove(filename)
+			print 'Download interrotto'
+		except IOError as e:
+			print '[ERROR]%s' %(e)
+			print '[!!]Sintassi corretta del comando DW: DW directory_remoto file_remoto directory_uscita esempio: DW / favicon.ico C:\Users\normal_user\Desktop'
+			print 'Per maggiori informazioni usare il comando HELP'
+                        
+                    
+	def download_all_file(self,directory_remota,directory_uscita = os.getcwd()):
+		"""Comando: DWA Parametri: directory_remota, directory_uscita
+		Compito: prende tutti i nomi di file di directory_remota e li scarica uno ad uno tramite il metodo download nella cartella d'uscita"""
+		try:
+			self.change_directory('R',directory_remota)
+			for x in self.ftp.mlsd(facts = ['type']):
+				if x[1]['type'] == 'file':
+					self.download(directory_remota, x[0], directory_uscita)
+		except ftplib.error_perm as e:
+			print '[ERROR] %s' %(e) #Error 500-599
+		except ftplib.error_temp as e:
+			print '[ERROR] %s' %(e) #Error 400-499
+                        
+                
+	def lista_file(self):
+		"""Comando: LIST    Parametri: //
+		Compito: Stampa la lista di file nella directory remota corrente
+		try:
+			list_file = self.ftp.mlsd(facts=['type','size'])
+			files = []
+			for x in list_file:
+				files.append(x.strip('),('))
+			for x in files:
+				print x
+				print
+                                
+		except ftplib.error_temp,e:
+			print '[ERROR]%s'%(e)
+			print 'Connessione...'
+			self.ftp.connect(self.site)
+ 			self.ftp.login(self.nick,self.pswd)"""
+		self.ftp.retrlines('LIST')
+        
+	def rename_file(self,filename,directory,nuovoNome):
+		"""Comando:REN         Paramentri: filename, directory, nuovoFile
+		Compito:Rinominare un file"""
+
+		if self.search_file(filename,directory):
+			self.ftp.rename(filename,nuovoName)
+			print 'File: %s cambiato in: %s' %(filename,nuovoNome)
+			return True
+		else:
+			print '[!!]Nessuna corrispondenza trovata!'
+			return False
+
+	def delete_file (self,filename,directory):
+		if self.search_file(filename,directory):
+ 			self.ftp.delete(filename)
+			print 'File %s cancellato!' %(filename)
+		else:
+			print '[!!]File non trovato'
+                        
+                
+	def upload(self,filename,directory_uscita):
+		"""Comando: UPL    Parametri: nameFile(Nome del file con relativo percorso), directory_uscita(Directory remota di uscita.
+		Compito: Invia un file al server  (Il valore predefinito è la directory remota corrente).
+		"""
+		try:
+			self.change_directory('R',directory_uscita)
+			file_locale = open(filename,'rb')
+			self.ftp.storbinary('STOR %s' %(str(filename)), file_locale)
+			print 'File inviato in %s' %(self.ftp.pswd())
+		except ftplib.error_perm,e:
+			print '[ERROR] %s' %(e)
+		except IOError,e:
+			print '[ERROR]%s' %(e)
+			print '[!!]Sintassi corretta del comando UPL: UPL  file_remoto directory_uscita esempio: UPL  favicon.ico C:\Users\normal_user\Desktop\Eggs'
+        
+	def controlla_cmd(self,comando):
+		"""Controlla se il  comando è valido"""
+		comando_VERO = comando[12:]
+#		print comando_VERO
+		comando_VERO = comando_VERO.split()
+#		print comando_VERO
+		comando_trovato = False
+		for x in comando_VERO:
+			if x.upper() in self.comandi:
+				comando_trovato = True
+				cmd = x.upper()
+				self.avvia_cmd(cmd,[y for y in comando_VERO if y != x])
+				break
+			else:
+				continue
+		if not comando_trovato:
+			print 'Usare help per una lista completa dei comandi'
+
+                
+	def avvia_cmd(self,cmd, argv):
+		"""Avvia il comando passato come parametro"""
+		argv =  list(argv)
+		numero_parametri = len(argv)
+		if cmd == self.comandi[0]:
+			self.remote_directory()
+		elif cmd == self.comandi[1]:
+			self.local_directory()
+		elif cmd == self.comandi[2]:
+			if numero_parametri < 2:
+				print '[ERROR]Parametri insufficenti!\nSintassi corretta: CD R NomeDirectory. CD L NomeDirectory.R=remote, L = Local.\nPer maggiori info usare il comando HELP\n'
+				return False
+			else:
+				self.change_directory(argv[0],argv[1])
+		elif cmd == self.comandi[3]:
+			if numero_parametri < 2:
+				print '[ERROR]Parametri non sufficienti'
+				return False
+			elif numero_parametri < 3:
+				print '[!!]Attenzione non è stata specificata la directory di uscita.Il file verrà salvato nelle directory corrente'
+				self.download(argv[0],argv[1])                                
+			else:
+				self.download(argv[0],argv[1],argv[2])
+		elif cmd == self.comandi[4]:
+			if numero_parametri < 1:
+				print '[ERROR]Parametri non sufficienti'
+			elif numero_parametri < 2:
+				print '[!!]Attenzione non è stata specificata la directory di uscita.I files verranno salvati nelle directory corrente'
+				self.download_all_file(argv[0])
+			else:
+				self.download_all_file(argv[0],argv[1])
+		elif cmd == self.comandi[5]:
+			self.lista_file()
+		elif cmd == self.comandi[6]:
+			if numero_parametri < 2:
+				print '[ERROR]Parametri non sufficienti'
+			else:
+				self.search_file(argv[0],argv[1])
+		elif cmd == self.comandi[7]:
+			if numero_parametri < 3:
+				print '[ERROR]Parametri non sufficienti'
+			else:
+				self.rename_file(argv[0],argv[1],argv[2])
+		elif cmd ==  self.comandi[8]:
+			if numero_parametri < 2:
+				print'[ERROR]Parametri non sufficienti'
+			else:
+				self.delete_file(argv[0],argv[1])
+		elif cmd == self.comandi[9]:                                        
+			if numero_parametri < 2:
+				print '[ERROR]Parametri non sufficienti'
+			else:
+				self.upload(argv[0],argv[1])
+		elif cmd == self.comandi[10]:
+			self.disconnect()
+		elif cmd == self.comandi[11]:
+			help(ftp_help)
+		elif cmd == self.comandi[12]:
+			self.info()
+			
 	def delete_event(self, widget, event, data=None):
 		return gtk.FALSE
 	def destroy(self, widget, data=None):
