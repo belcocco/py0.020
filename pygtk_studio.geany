@@ -24,8 +24,20 @@ long_line_column=72
 
 [files]
 current_page=0
-FILE_NAME_0=46243;Python;0;16;1;1;0;%2Fhome%2Fraga%2Fpy0.020%2Fpygtk_studio.py;0;4
-FILE_NAME_1=1696;Python;0;16;1;1;0;%2Fhome%2Fraga%2Fpy-esempi%2FClientFTP.py;0;4
+FILE_NAME_0=40361;Python;0;16;1;1;0;%2Fhome%2Fraga%2Fpy0.020%2Fpygtk_studio.py;0;4
 
 [VTE]
 last_dir=/home/raga
+
+[debugger]
+target=
+debugger=GDB
+arguments=
+envvar_count=0
+watches_count=0
+breaks_count=1
+break_0_file=/home/raga/py0.020/pygtk_studio.py
+break_0_line=162
+break_0_condition=
+break_0_hits_count=0
+break_0_enabled=true

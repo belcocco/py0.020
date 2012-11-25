@@ -97,7 +97,10 @@ ftp_help = unicode(u"""Client FTP da linea di comando (Tutti i comandi posso ess
 
             N.B.: DW e UPL cambiano automaticamente le dir di destinazione
                   se differiscono dal puntamento (ld, rd) di prima del comando.""")
+#Nomi dei file interessati alle attività
+file_ftp_out = "comando_ftp.out"
 #Finestra principale con tutti i bottoni delle attività
+
 class MainWin(gtk.Window):
     def __init__(self):
         super(MainWin, self).__init__()
@@ -487,6 +490,7 @@ class GUI_ftp():
 		self.nick = self.entry2.get_text()
 		self.pswd = self.entry3.get_text()
 		self.ftp = self.connessione(self.site,self.nick,self.pswd)
+		print self.ftp
 #		self.online = None
 #		self.comandi = ['RD', 'LD', 'CD', 'DW','DWA','LIST','SEARCH','REN','DEL','UPL','QUIT','HELP','INFO']
 #		while self.online:
@@ -844,7 +848,7 @@ class Outwin():
         box2.pack_start(sw)
 
         # Carica il file generato dal comando git relativo ai messaggi di errore ecc.
-        
+        print NameFileOut
         infile = open(NameFileOut, "r")
 
         if infile:
@@ -971,25 +975,26 @@ class Outwin():
 class Comandi_FTP(): 
 	#Stato_server = stringa di welcome oppure stringa d'errore
 	#Errore_connessione = TRUE (se c'è errore) oppure FALSE (se non c'è)
+
 	def __init__(self, Stato_server, Errore_connessione):  
 #Label e spazio per controllare l'inserimento del comando indirizzo server
-		self.win = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.win.set_title("Connessione FTP")
-#		self.win.set_default_size(200, 80)
-		self.win.set_size_request(500, 460)		#dimensione della finestra per 4 button (100,180)
-		self.win.set_position(gtk.WIN_POS_CENTER)
-		self.win.set_resizable(gtk.TRUE)
-		self.win.set_border_width(10)
-		self.win.modify_bg(gtk.STATE_NORMAL, marine)    
+		self.win_com_ftp = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		self.win_com_ftp.set_title("Connessione FTP")
+#		self.win_com_ftp.set_default_size(200, 80)
+		self.win_com_ftp.set_size_request(500, 460)		#dimensione della finestra per 4 button (100,180)
+		self.win_com_ftp.set_position(gtk.WIN_POS_CENTER)
+		self.win_com_ftp.set_resizable(gtk.TRUE)
+		self.win_com_ftp.set_border_width(10)
+		self.win_com_ftp.modify_bg(gtk.STATE_NORMAL, marine)    
 
-		self.win.connect("delete_event", self.delete_event)
-		self.win.connect("destroy", self.destroy)
+		self.win_com_ftp.connect("delete_event", self.delete_event)
+		self.win_com_ftp.connect("destroy", self.destroy)
 
 #		self.vbox = gtk.VBox()
 
 #		self.vbox = gtk.VBox(gtk.TRUE, 3)
 		self.vbox = gtk.VBox(gtk.TRUE, 10)
-		self.win.add(self.vbox)
+		self.win_com_ftp.add(self.vbox)
 		self.vbox.show()
 
 #Frame con la risposta del server a connessione avvenuta
@@ -1032,28 +1037,17 @@ class Comandi_FTP():
 
 #Visualizza prompt: ClientFTP>>>
 		self.entry1.set_text("ClientFTP>>>")
-		self.win.show_all()
+		self.win_com_ftp.show_all()
 
 
 #Gestisce i comandi 
 	def exec_ftp_cmd(self, widget):
 		self.online = True
 		self.comandi = ['RD', 'LD', 'CD', 'DW','DWA','LIST','SEARCH','REN','DEL','UPL','QUIT','HELP','INFO']
-		print "BoH"
 		while self.online:
-#			command = raw_input('ClientFTP >>> ')
-			command = self.entry1.get_text()
-			print "PAPERA"
-			self.controlla_cmd(command)
-			
-
-
-############################################################################
-#		NameFileOut = ""
-#		self.entry2.set_text(" ")
-#		self.entry3.set_text(" ")
-############################################################################                        
-        
+#		command = self.entry1.get_text()
+		self.controlla_cmd(command)
+       
 	def disconnect(self):
 		"""Si disconnette dal server e termina il programma"""
 		self.ftp.quit()
@@ -1063,8 +1057,14 @@ class Comandi_FTP():
 	def local_directory(self):
  		"""Comando: LD    Parametri: None
 		Computo: restiruisce informazioni sulla directory locale corrente"""
-		print 'Direcory locale corrente: %s' %(os.getcwd())
-        
+
+		file1 = open("comando_ftp.out","w")
+		file1.write("Direcory locale corrente: ")
+		file1.write(os.getcwd())
+		file1.close()
+		print "Direcory locale corrente: %s" %(os.getcwd())
+		Outwin("comando_ftp.out")
+		
 	def remote_directory(self):
 		"""Comando: RD   Parametri: None
 		Compito: Restituisce informazioni sulla directory remota corrente"""
@@ -1226,8 +1226,7 @@ class Comandi_FTP():
 				continue
 		if not comando_trovato:
 			print 'Usare help per una lista completa dei comandi'
-
-                
+               
 	def avvia_cmd(self,cmd, argv):
 		"""Avvia il comando passato come parametro"""
 		argv =  list(argv)
@@ -1295,8 +1294,8 @@ class Comandi_FTP():
 
 class Attvarwin:		#la classe principale contenete tutte le funzioni
     def __init__(self):		#la funzione principale della classe
-        self.win = gtk.Window(gtk.WINDOW_TOPLEVEL)		#la finestra contenitore
-        self.win.set_title("Attività Varie")		#setta il titolo della finestra
+        self.win_att_var = gtk.Window(gtk.WINDOW_TOPLEVEL)		#la finestra contenitore
+        self.win_att_var.set_title("Attività Varie")		#setta il titolo della finestra
 #---------------------------------------------------------------
 	#definisco tutte le variabili dei box
 #----------------------------------------------------------------
@@ -1313,7 +1312,7 @@ class Attvarwin:		#la classe principale contenete tutte le funzioni
 	
 #-------------------------------------------------------------
 	
-	self.win.connect("destroy", self.exit)		#assegno al pulsante destroy 
+	self.win_att_var.connect("destroy", self.exit)		#assegno al pulsante destroy 
 	self.labelcent = gtk.Label("yum update, ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc. ecc.")
 	fg_color_Att = pango.AttrForeground(65535, 0, 0, 0, 1000)
 	size_Att = pango.AttrSize(20000, 0, -1)
@@ -1386,8 +1385,8 @@ class Attvarwin:		#la classe principale contenete tutte le funzioni
 	#-----------------------------------------------------------------------
 	
 	#aggiungo a win la variabile che contiene tutte le box(vboxer)
-	self.win.add(vboxer)
-        self.win.show_all()
+	self.win_att_var.add(vboxer)
+        self.win_att_var.show_all()
 
     def win1(self, widget):		#funzione contenete la finestra win1
 	self.win1 = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -1912,10 +1911,6 @@ class Attvarwin:		#la classe principale contenete tutte le funzioni
  
     def main(self):							#esegue il tutto
         gtk.main()
-
-
-
-
 
 class PangoApp1(gtk.Window): 
     def __init__(self):
