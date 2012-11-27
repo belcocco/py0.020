@@ -1,0 +1,20 @@
+Client FTP da linea di comando (Tutti i comandi posso essere scritti in minuscolo)
+   Funzione:           Comandi associati    esempio: 
+	
+-Directory locale         LD                ld     (si vede dove punta)
+-Directory remota         RD                rd     (si vede dove punta)
+-Cambio dir locale        CD                cd l /dir_da_aggiungere_al_path_di_ld
+-Cambio dir remota        CD                cd r /dir_da_aggiungere_al_path_di_rd
+-Lista File               LIST              list
+-Ricerca File             SEARCH            search nome_file
+-Rinomina File            REN               ren nome_file dir nuovo_mome_file
+-Elimina File             DEL               del nome_file dir
+-Download file            DW                dw dir_remota filename dir_locale_di_uscita(_che può essere omessa)
+-Download all file        DWA               dwa dir_remota filename dir_locale_di_uscita(_che può essere omessa)
+-Invio file               UPL               upl nome_file dir_remota_di_uscita 
+	
+-Disconnessione           QUIT              quit
+	
+N.B.: 	DW e UPL cambiano automaticamente le dir di destinazione
+	se differiscono dal puntamento (ld, rd) di prima del comando.
+        

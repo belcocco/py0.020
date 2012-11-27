@@ -51,7 +51,7 @@ fg_color = pango.AttrForeground(65565, 0, 0, 0, 6)
 underline = pango.AttrUnderline(pango.UNDERLINE_DOUBLE, 7, 11)
 bg_color = pango.AttrBackground(40000, 40000, 40000, 12, 19)
 strike = pango.AttrStrikethrough(True, 20, 29)
-size = pango.AttrSize(20000, 0, -1)
+size20000 = pango.AttrSize(20000, 0, -1)
 size10000 = pango.AttrSize(10000, 0, -1)
 	#Testi vari
 txt_clone = "CLONE"
@@ -74,32 +74,35 @@ txt_pswd_default = "ragamuz"
 #nick = "anonymous"
 #pswd = ""
 
+#Nomi dei file interessati alle attività
+file_ftp_out = "comando_ftp.out"
+
 objru = unicode(u'''Фёдор Михайлович Достоевский родился 30 октября (11 ноября)
 1821 года в Москве. Был вторым из 7 детей. Отец, Михаил Андреевич, 
 работал вгоспитале для бедных. Мать, Мария Фёдоровна 
 (в девичестве Нечаева), происходила из купеческого рода.''')
-ftp_help = unicode(u"""Client FTP da linea di comando (Tutti i comandi posso essere scritti in minuscolo)
-           Dopo aver avviato servono 'site' 'nick' e 'password' per attivare la 'Connessione'
-           Funzioni:               Comandi associati         esempio: 
+class Help_FTP(object):
+	"""Client FTP da linea di comando (Tutti i comandi posso essere scritti in minuscolo)
+	Dopo aver avviato servono 'site' 'nick' e 'password' per attivare la 'Connessione'
+	Funzioni:               Comandi associati         esempio: 
+	
+	-Directory locale         LD                        ld     (si vede dove punta)
+	-Directory remota         RD                        rd     (si vede dove punta)
+	-Cambio directory locale  CD                        cd l /nome_da_aggiungere_al_path_di_ld
+	-Cambio directory remota  CD                        cd r /nome_da_aggiungere_al_path_di_rd
+	-Lista File               LIST                      list
+	-Ricerca File             SEARCH                    search nome_file
+	-Rinomina File            REN                       ren nome_file dir nuovo_mome_file
+	-Elimina File             DEL                       del nome_file dir
+	-Download file            DW                        dw dir_remota filename dir_locale_di_uscita(_che può essere omessa)
+	-Download all file        DWA                       dwa dir_remota filename dir_locale_di_uscita(_che può essere omessa)
+	-Invio file               UPL                       upl nome_file dir_remota_di_uscita 
+	
+	-Disconnessione           QUIT                      quit
+	
+	N.B.: DW e UPL cambiano automaticamente le dir di destinazione
+	se differiscono dal puntamento (ld, rd) di prima del comando."""
 
-           -Directory locale         LD                        ld     (si vede dove punta)
-           -Directory remota         RD                        rd     (si vede dove punta)
-           -Cambio directory locale  CD                        cd l /nome_da_aggiungere_al_path_di_ld
-           -Cambio directory remota  CD                        cd r /nome_da_aggiungere_al_path_di_rd
-           -Lista File               LIST                      list
-           -Ricerca File             SEARCH                    search nome_file
-           -Rinomina File            REN                       ren nome_file dir nuovo_mome_file
-           -Elimina File             DEL                       del nome_file dir
-           -Download file            DW                        dw dir_remota filename dir_locale_di_uscita(_che può essere omessa)
-           -Download all file        DWA                       dwa dir_remota filename dir_locale_di_uscita(_che può essere omessa)
-           -Invio file               UPL                       upl nome_file dir_remota_di_uscita 
-                 -
-           -Disconnessione           QUIT                      quit
-
-            N.B.: DW e UPL cambiano automaticamente le dir di destinazione
-                  se differiscono dal puntamento (ld, rd) di prima del comando.""")
-#Nomi dei file interessati alle attività
-file_ftp_out = "comando_ftp.out"
 #Finestra principale con tutti i bottoni delle attività
 
 class MainWin(gtk.Window):
@@ -437,7 +440,7 @@ class GUI_ftp():
 #		size_Att = pango.AttrSize(20000, 0, -1)
 		attr = pango.AttrList()
 		attr.insert(fg_color)
-		attr.insert(size)
+		attr.insert(size10000)
 		self.labelcent1.set_attributes(attr)
 		self.vbox.pack_start(self.frame1, gtk.TRUE, gtk.TRUE, 0)
 		self.frame1.add(self.labelcent1)
@@ -451,7 +454,7 @@ class GUI_ftp():
 #		size_Att = pango.AttrSize(20000, 0, -1)
 		attr = pango.AttrList()
 		attr.insert(fg_color)
-		attr.insert(size)
+		attr.insert(size10000)
 		self.labelcent2.set_attributes(attr)
 		self.vbox.pack_start(self.frame2, gtk.TRUE, gtk.TRUE, 0)
 		self.frame2.add(self.labelcent2)
@@ -464,7 +467,7 @@ class GUI_ftp():
 #		size_Att = pango.AttrSize(20000, 0, -1)
 		attr = pango.AttrList()
 		attr.insert(fg_color)
-		attr.insert(size)
+		attr.insert(size10000)
 		self.labelcent3.set_attributes(attr)
 		self.vbox.pack_start(self.frame3, gtk.TRUE, gtk.TRUE, 0)
 		self.frame3.add(self.labelcent3)
@@ -666,7 +669,7 @@ class GUI_ftp():
 			self.ftp.connect(self.site)
  			self.ftp.login(self.nick,self.pswd)"""
 		file1 = open("comando_ftp.out","w")
-		file1.write("Direcory locale corrente: ")
+#		file1.write("Directory locale corrente: ")
 		file1.write(self.ftp.retrlines('LIST'))
 		file1.close()
 							#self.ftp.retrlines('LIST')
@@ -781,7 +784,12 @@ class GUI_ftp():
 		elif cmd == self.comandi[10]:
 			self.disconnect()
 		elif cmd == self.comandi[11]:
-			help(ftp_help)
+#			help(Help_FTP)
+			print "PRIMA"
+			NameFileOut = "help_ftp.txt"
+			Outwin(NameFileOut)
+			print "DOPO"
+			
 		elif cmd == self.comandi[12]:
 			self.info()
 			
@@ -790,15 +798,6 @@ class GUI_ftp():
 	def destroy(self, widget, data=None):
 		return #gtk.main_quit()
 
-
-
-			
-
-	def delete_event(self, widget, event, data=None):
-		return gtk.FALSE
-	def destroy(self, widget, data=None):
-		return #gtk.main_quit()
- 
 class GUI_hack:
 	def __init__(self):
 		print "----- GUI_hack -------"
@@ -1133,7 +1132,7 @@ class Outwin():
             infile.close()
             textbuffer.set_text(string)
 
-        hbox = gtk.HButtonBox()
+        '''hbox = gtk.HButtonBox()
         box2.pack_start(hbox, False, False, 0)
         hbox.show()
 
@@ -1217,10 +1216,10 @@ class Outwin():
 #        box2.pack_start(button, True, True, 0)
 #        button.set_flags(gtk.CAN_DEFAULT)
 #        button.grab_default()
-#        button.show()
+#        button.show()'''
         window.show()
 
-    def toggle_editable(self, checkbutton, textview):
+    '''def toggle_editable(self, checkbutton, textview):
         textview.set_editable(checkbutton.get_active())
 
     def toggle_cursor_visible(self, checkbutton, textview):
@@ -1244,7 +1243,7 @@ class Outwin():
 
     def new_justification(self, radiobutton, textview, val):
         if radiobutton.get_active():
-            textview.set_justification(val)
+            textview.set_justification(val)'''
 
     def destroy(self, widget):
         return #gtk.main_quit()
@@ -1281,7 +1280,7 @@ class Outwin_msg_FTP():
 #		size_Att = pango.AttrSize(20000, 0, -1)
 			attr = pango.AttrList()
 			attr.insert(fg_color)
-			attr.insert(size)
+			attr.insert(size20000)
 			self.labelcent4.set_attributes(attr)
 			self.vbox.pack_start(self.frame4, gtk.TRUE, gtk.TRUE, 0)
 			self.frame4.add(self.labelcent4)
@@ -1295,7 +1294,7 @@ class Outwin_msg_FTP():
 #		size_Att = pango.AttrSize(20000, 0, -1)
 			attr = pango.AttrList()
 			attr.insert(fg_color)
-			attr.insert(size)
+			attr.insert(size20000)
 			self.labelcent4.set_attributes(attr)
 			self.vbox.pack_start(self.frame4, gtk.TRUE, gtk.TRUE, 0)
 			self.frame4.add(self.labelcent4)
