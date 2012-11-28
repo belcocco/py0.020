@@ -1,20 +1,22 @@
-Client FTP da linea di comando (Tutti i comandi posso essere scritti in minuscolo)
-   Funzione:           Comandi associati    esempio: 
+Client FTP da linea di comando (Tutti i comandi posso essere scritti anche in maiuscolo)
+
+		Funzioni:				Esempio: 
 	
--Directory locale         LD                ld     (si vede dove punta)
--Directory remota         RD                rd     (si vede dove punta)
--Cambio dir locale        CD                cd l /dir_da_aggiungere_al_path_di_ld
--Cambio dir remota        CD                cd r /dir_da_aggiungere_al_path_di_rd
--Lista File               LIST              list
--Ricerca File             SEARCH            search nome_file
--Rinomina File            REN               ren nome_file dir nuovo_mome_file
--Elimina File             DEL               del nome_file dir
--Download file            DW                dw dir_remota filename dir_locale_di_uscita(_che può essere omessa)
--Download all file        DWA               dwa dir_remota filename dir_locale_di_uscita(_che può essere omessa)
--Invio file               UPL               upl nome_file dir_remota_di_uscita 
+	-Directory locale			ld			(si vede dove punta)
+	-Directory remota			rd   		(si vede dove punta)
+	-Cambio directory locale	cd l /nome_da_aggiungere_al_path_di_ld
+	-Cambio directory remota	cd r /nome_da_aggiungere_al_path_di_rd
+	-Lista File				list
+	-Ricerca File				search nome_file
+	-Rinomina File				ren nome_file dir nuovo_mome_file
+	-Elimina File				del nome_file dir
+	-Download file			dw dir_remota filename dir_locale_di_uscita(_che può essere omessa)
+	-Download all file			dwa dir_remota filename dir_locale_di_uscita(_che può essere omessa)
+	-Invio file				upl nome_file dir_remota_di_uscita 
 	
--Disconnessione           QUIT              quit
+	-Disconnessione			quit
 	
-N.B.: 	DW e UPL cambiano automaticamente le dir di destinazione
-	se differiscono dal puntamento (ld, rd) di prima del comando.
+	N.B.: DW e UPL cambiano automaticamente le dir di destinazione
+	se differiscono dal puntamento (ld, rd) di prima del comando."""
+
 
