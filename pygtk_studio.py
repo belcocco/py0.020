@@ -415,6 +415,11 @@ class GUI_git():
 
 class GUI_ftp():
 	def __init__(self):
+		#Azzera il file di output dei comandi
+		file1 = open("comando_ftp.out","w") #"a"=append, "w"=sovrascrive, "r"=legge, "r+"=lettura e scrittura
+		file1.write("")
+		file1.close()
+
 		self.win_ftp = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.win_ftp.set_title("FTP")
 		self.win_ftp.set_default_size(400,295)
@@ -533,7 +538,6 @@ class GUI_ftp():
 
 #Gestisce i comandi 
 	def exec_ftp_cmd(self, widget):
-
 		self.online = True
 		self.comandi = ['RD', 'LD', 'CD', 'DW','DWA','LIST','SEARCH','REN','DEL','UPL','QUIT','HELP','INFO']
 #		while self.online:
@@ -557,19 +561,21 @@ class GUI_ftp():
  		"""Comando: LD    Parametri: None
 		Computo: restiruisce informazioni sulla directory locale corrente"""
 
-		file1 = open("comando_ftp.out","w")
-		file1.write("Direcory locale corrente: ")
+		file1 = open("comando_ftp.out","a") 			#"a"=append
+		file1.write("Directory locale corrente: ")
 		file1.write(os.getcwd())
+		file1.write("\n")
 		file1.close()
 		Outwin("comando_ftp.out")
-		print "Direcory locale corrente: %s" %(os.getcwd())
+		print "Directory locale corrente: %s" %(os.getcwd())
 		
 	def remote_directory(self):
 		"""Comando: RD   Parametri: None
 		Compito: Restituisce informazioni sulla directory remota corrente"""
-		file1 = open("comando_ftp.out","w")
-		file1.write("Direcory remota corrente: ")
+		file1 = open("comando_ftp.out","a") 			#"a"=append
+		file1.write("Directory remota corrente: ")
 		file1.write(self.ftp.pwd())
+		file1.write("\n")
 		file1.close()
 		Outwin("comando_ftp.out")
 		print 'Directory remota corrente: %s' %(self.ftp.pwd())
@@ -580,9 +586,10 @@ class GUI_ftp():
 		if place.upper() == 'R':
 			try:
 				self.ftp.cwd(path)
-				file1 = open("comando_ftp.out","w")
+				file1 = open("comando_ftp.out","a") 			#"a"=append
 				file1.write("Directory remota cambiata in: ")
 				file1.write(self.ftp.pwd())
+				file1.write("\n")
 				file1.close()
 				Outwin("comando_ftp.out")
 				print 'Directory remota cambiata in : %s' %(self.ftp.pwd())
@@ -598,9 +605,10 @@ class GUI_ftp():
 		elif place.upper() == 'L':
 			try:
 				os.chdir(path)
-				file1 = open("comando_ftp.out","w")
+				file1 = open("comando_ftp.out","a") 			#"a"=append
 				file1.write("Directory locale cambiata in: ")
 				file1.write(os.getcwd())
+				file1.write("\n")
 				file1.close()
 				Outwin("comando_ftp.out")
 				print 'Directory locale cambiata in: %s' %(os.getcwd())
@@ -617,7 +625,7 @@ class GUI_ftp():
 			self.online = False
 			Errore_connessione = True
 			Stato_server = "Disconnessione effettuata"  #[FATAL ERROR] Connessione fallita!"
-			Outwin_msg_FTP(Stato_server, Errore_connessione, self.site)
+			Outwin_msg_FTP(Stato_server, Errore_connessione, server_ind, serverID)
 			print 'Error, place non supportato!\nPlace supportati: R,L\nR = remote\nL = local'
 			return False
 
@@ -686,8 +694,9 @@ class GUI_ftp():
                         
                 
 	def lista_file(self):
-		"""Comando: LIST    Parametri: //
-		Compito: Stampa la lista di file nella directory remota corrente
+
+		'''Comando: LIST    Parametri: //
+		Compito: Stampa la lista di file della directory remota corrente
 		try:
 			list_file = self.ftp.mlsd(facts=['type','size'])
 			files = []
@@ -701,14 +710,36 @@ class GUI_ftp():
 			print '[ERROR]%s'%(e)
 			print 'Connessione...'
 			self.ftp.connect(self.site)
- 			self.ftp.login(self.nick,self.pswd)"""
-		file1 = open("comando_ftp.out","w")
-#		file1.write("Directory locale corrente: ")
-		file1.write(self.ftp.retrlines('LIST'))
+ 			self.ftp.login(self.nick,self.pswd)'''
+#		print "111111111"
+#		stringa = self.ftp.retrlines('LIST')
+#		print "222222222"
+#		print stringa
+#		print "333333333"
+		file1 = open("comando_ftp.out","a") 			#"a"=append
+#
+#		if file1:
+#			file1.write(self.ftp.retrlines('LIST'))
+#		file1.write("\n")
+#		file1 = open("comando_ftp.out","r") 			#"r"=read
+#		file1.close()
+#		if file1.readline != "":
+#			print "pippo"#file1.readline()
+#		Outwin("comando_ftp.out")
+		mylist = []
+
+		self.ftp.retrlines('NLST', mylist.append)
+		file1.write("File della Directory remota\n")
+		file1.write("---------------------------\n")
+		for x in mylist:
+			print x
+			file1.write(x)
+			file1.write("\n")
 		file1.close()
-							#self.ftp.retrlines('LIST')
 		Outwin("comando_ftp.out")
-        
+	
+#		self.ftp.retrlines('NLST') #'LIST')
+
 	def rename_file(self,filename,directory,nuovoNome):
 		"""Comando:REN         Paramentri: filename, directory, nuovoFile
 		Compito:Rinominare un file"""
@@ -818,11 +849,8 @@ class GUI_ftp():
 		elif cmd == self.comandi[10]:
 			self.disconnect()
 		elif cmd == self.comandi[11]:
-#			help(Help_FTP)
-			print "PRIMA"
 			NameFileOut = "help_ftp.txt"
 			Outwin(NameFileOut)
-			print "DOPO"
 			
 		elif cmd == self.comandi[12]:
 			self.info()
@@ -1158,7 +1186,7 @@ class Outwin():
         box2.pack_start(sw)
 
         # Carica il file generato dal comando git relativo ai messaggi di errore ecc.
-        print NameFileOut
+        #print NameFileOut
         infile = open(NameFileOut, "r")
 
         if infile:

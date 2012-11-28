@@ -4,15 +4,15 @@ Client FTP da linea di comando (Tutti i comandi posso essere scritti anche in ma
 	
 	-Directory locale			ld			(si vede dove punta)
 	-Directory remota			rd   		(si vede dove punta)
-	-Cambio directory locale	cd l /nome_da_aggiungere_al_path_di_ld
+	-Cambio directory locale		cd l /nome_da_aggiungere_al_path_di_ld
 	-Cambio directory remota	cd r /nome_da_aggiungere_al_path_di_rd
-	-Lista File				list
+	-Lista File					list
 	-Ricerca File				search nome_file
 	-Rinomina File				ren nome_file dir nuovo_mome_file
 	-Elimina File				del nome_file dir
-	-Download file			dw dir_remota filename dir_locale_di_uscita(_che può essere omessa)
+	-Download file				dw dir_remota filename dir_locale_di_uscita(_che può essere omessa)
 	-Download all file			dwa dir_remota filename dir_locale_di_uscita(_che può essere omessa)
-	-Invio file				upl nome_file dir_remota_di_uscita 
+	-Invio file					upl nome_file dir_remota_di_uscita 
 	
 	-Disconnessione			quit
 	
