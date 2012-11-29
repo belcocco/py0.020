@@ -365,7 +365,7 @@ class GUI_git():
 		elif CMD_git == pushtext:
 			self.entry3.set_text("Push eseguito con SUCCESSO sul repository di GITHUB")
 #		if NameFileOut != "":
-		Outwin(NameFileOut)	#Visualizzazione della finestra degli output del comando git
+		Outwin_GIT(NameFileOut)	#Visualizzazione della finestra degli output del comando git
 		print proc.returncode
 		
 #Comando GIT CLONE
@@ -419,6 +419,7 @@ class GUI_ftp():
 		file1 = open("comando_ftp.out","w") #"a"=append, "w"=sovrascrive, "r"=legge, "r+"=lettura e scrittura
 		file1.write("")
 		file1.close()
+		outwin_ftp_close = False
 
 		self.win_ftp = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.win_ftp.set_title("FTP")
@@ -521,8 +522,9 @@ class GUI_ftp():
 		try:
 			self.ftp = ftplib.FTP(self.site, self.nick, self.pswd)
 			Errore_connessione = False 
-			Stato_server = self.ftp.getwelcome()
+			winout_ftp_close = False
 			self.online = True
+			Stato_server = self.ftp.getwelcome()
 			self.entry4.set_text("ClientFTP>>>")	#Visualizza prompt: ClientFTP>>>
 			serverID = 1
 		except ftplib.all_errors,error:
@@ -535,13 +537,15 @@ class GUI_ftp():
 		print server_ind
 		Outwin_msg_FTP(Stato_server, Errore_connessione, server_ind, serverID)
 
-
+	
 #Gestisce i comandi 
 	def exec_ftp_cmd(self, widget):
 		self.online = True
 		self.comandi = ['RD', 'LD', 'CD', 'DW','DWA','LIST','SEARCH','REN','DEL','UPL','QUIT','HELP','INFO']
-#		while self.online:
 
+		#Apri la finestra dell'output dei comandi
+#		Outwin_FTP("comando_ftp.out")
+	
 		command = self.entry4.get_text()
 		self.controlla_cmd(command)
 
@@ -566,7 +570,8 @@ class GUI_ftp():
 		file1.write(os.getcwd())
 		file1.write("\n")
 		file1.close()
-		Outwin("comando_ftp.out")
+		out_win_out = True
+		Outwin_FTP("comando_ftp.out")
 		print "Directory locale corrente: %s" %(os.getcwd())
 		
 	def remote_directory(self):
@@ -577,7 +582,7 @@ class GUI_ftp():
 		file1.write(self.ftp.pwd())
 		file1.write("\n")
 		file1.close()
-		Outwin("comando_ftp.out")
+		Outwin_FTP("comando_ftp.out")
 		print 'Directory remota corrente: %s' %(self.ftp.pwd())
         
 	def change_directory(self,place,path):
@@ -591,7 +596,7 @@ class GUI_ftp():
 				file1.write(self.ftp.pwd())
 				file1.write("\n")
 				file1.close()
-				Outwin("comando_ftp.out")
+				Outwin_FTP("comando_ftp.out")
 				print 'Directory remota cambiata in : %s' %(self.ftp.pwd())
 				return True
 			except ftplib.all_errors ,e:
@@ -610,7 +615,7 @@ class GUI_ftp():
 				file1.write(os.getcwd())
 				file1.write("\n")
 				file1.close()
-				Outwin("comando_ftp.out")
+				Outwin_FTP("comando_ftp.out")
 				print 'Directory locale cambiata in: %s' %(os.getcwd())
 				return True
 			except os.error,e:
@@ -632,21 +637,30 @@ class GUI_ftp():
 	def search_file(self,filename,directory):		
 		"""Comando: Search        Parametri: filename, directory
 		Compito: Cerca un file"""
-		try:
-			self.change_directory('R',directory)
-			list_file = self.ftp.mlsd(facts=['type','size'])
-			_file=[x for x in list_file if filename in x]
-			if _file == []:
-				print '[!!]File %s non trovato!' %(filename)
-				return False
-			else:
-				print _file
-				return True
-		except ftplib.error_temp,e:
-				print '[ERROR]%s'%(e)
-				print 'Connessione...'
-				self.ftp.connect(self.site)
-				self.ftp.login(self.nick,self.pswd)
+		file1 = open("comando_ftp.out","a") 			#"a"=append
+		list_dir = []
+		self.change_directory('R',directory)
+
+		self.ftp.retrlines('NLST', list_dir.append)
+		list_dir.sort()		#metti la lista in ordine alfabetico 
+		_file=[x for x in list_dir if filename in x]
+		if _file == []:
+			fname = filename
+			msg_non_trovato = ('[!!]File %s non trovato!', filename)
+			file1.write(msg_non_trovato)
+			file1.write("---------------------------\n")
+			file1.write("\n")
+			print '[!!]File %s non trovato!', fname
+			return
+		else:
+			msg_trovato = ('[OK] File %s trovato!', _file )
+			file1.write(msg_trovato)
+			file1.write("---------------------------\n")
+			file1.write("\n")
+			print _file
+			return
+		file1.close()
+		Outwin_FTP("comando_ftp.out")
                         
                         
         
@@ -694,54 +708,27 @@ class GUI_ftp():
                         
                 
 	def lista_file(self):
-
-		'''Comando: LIST    Parametri: //
-		Compito: Stampa la lista di file della directory remota corrente
-		try:
-			list_file = self.ftp.mlsd(facts=['type','size'])
-			files = []
-			for x in list_file:
-				files.append(x.strip('),('))
-			for x in files:
-				print x
-				print
-                                
-		except ftplib.error_temp,e:
-			print '[ERROR]%s'%(e)
-			print 'Connessione...'
-			self.ftp.connect(self.site)
- 			self.ftp.login(self.nick,self.pswd)'''
-#		print "111111111"
-#		stringa = self.ftp.retrlines('LIST')
-#		print "222222222"
-#		print stringa
-#		print "333333333"
 		file1 = open("comando_ftp.out","a") 			#"a"=append
-#
-#		if file1:
-#			file1.write(self.ftp.retrlines('LIST'))
-#		file1.write("\n")
-#		file1 = open("comando_ftp.out","r") 			#"r"=read
-#		file1.close()
-#		if file1.readline != "":
-#			print "pippo"#file1.readline()
-#		Outwin("comando_ftp.out")
-		mylist = []
+		list_dir = []
 
-		self.ftp.retrlines('NLST', mylist.append)
-		file1.write("File della Directory remota\n")
+		self.ftp.retrlines('NLST', list_dir.append)
+		strg_dir = repr(len(list_dir))	#un numero intero (esempio 10) diventa Ascii (31h 30Hstringa)  
+#		print strg_dir
+		list_dir.sort()		#metti la lista in ordine alfabetico 
+		file1.write(strg_dir)
+		file1.write(" File'('s')' nella Directory remota\n")
 		file1.write("---------------------------\n")
-		for x in mylist:
+		for x in list_dir:
 			print x
 			file1.write(x)
 			file1.write("\n")
 		file1.close()
-		Outwin("comando_ftp.out")
+		Outwin_FTP("comando_ftp.out")
 	
 #		self.ftp.retrlines('NLST') #'LIST')
 
 	def rename_file(self,filename,directory,nuovoNome):
-		"""Comando:REN         Paramentri: filename, directory, nuovoFile
+		"""Comando:REN Paramentri: filename, directory, nuovoFile
 		Compito:Rinominare un file"""
 
 		if self.search_file(filename,directory):
@@ -774,7 +761,12 @@ class GUI_ftp():
 		except IOError,e:
 			print '[ERROR]%s' %(e)
 			print '[!!]Sintassi corretta del comando UPL: UPL  file_remoto directory_uscita esempio: UPL  favicon.ico C:\Users\normal_user\Desktop\Eggs'
-        
+
+	def help_cmd(self):
+		NameFileOut = "help_ftp.txt"
+		Outwin_FTP(NameFileOut)
+
+
 	def controlla_cmd(self,comando):
 		"""Controlla se il  comando è valido"""
 		comando_VERO = comando[12:]
@@ -849,11 +841,11 @@ class GUI_ftp():
 		elif cmd == self.comandi[10]:
 			self.disconnect()
 		elif cmd == self.comandi[11]:
-			NameFileOut = "help_ftp.txt"
-			Outwin(NameFileOut)
-			
-		elif cmd == self.comandi[12]:
-			self.info()
+			self.help_cmd()
+
+#COMANDO DI RISERVA			
+#		elif cmd == self.comandi[12]:
+#			self.info()
 			
 	def delete_event(self, widget, event, data=None):
 		return gtk.FALSE
@@ -1156,159 +1148,84 @@ class GUI_foto:
     def destroy(self, widget, data=None):
         return #gtk.main_quit()
 
-class Outwin():
+class Outwin_GIT():
     def __init__(self, NameFileOut):
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.set_resizable(True)  
-        window.connect("destroy", self.destroy)
-        window.set_title("Output dei comandi")
-        window.set_size_request(600, 460)		#dimensione della finestra per 4 button (100,180)
-        window.set_border_width(0)
-        window.modify_bg(gtk.STATE_NORMAL, giallo)    
+		window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		window.set_resizable(True)  
+#		window.connect("destroy", self.destroy)
+		window.set_title("Output dei comandi")
+		window.set_size_request(600, 460)		#dimensione della finestra per 4 button (100,180)
+		window.set_border_width(0)
+		window.modify_bg(gtk.STATE_NORMAL, giallo)    
 
-        box1 = gtk.VBox(False, 0)
-        window.add(box1)
-        box1.show()
+		box1 = gtk.VBox(False, 0)
+		window.add(box1)
+		box1.show()
 
-        box2 = gtk.VBox(False, 10)
-        box2.set_border_width(10)
-        box1.pack_start(box2, True, True, 0)
-        box2.show()
+		box2 = gtk.VBox(False, 10)
+		box2.set_border_width(10)
+		box1.pack_start(box2, True, True, 0)
+		box2.show()
 
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        textview = gtk.TextView()
-        textbuffer = textview.get_buffer()
-        sw.add(textview)
-        sw.show()
-        textview.show()
+		sw = gtk.ScrolledWindow()
+		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		textview = gtk.TextView()
+		textbuffer = textview.get_buffer()
+		sw.add(textview)
+		sw.show()
+		textview.show()
+		box2.pack_start(sw)
+		self.outwin_open = True
 
-        box2.pack_start(sw)
+		# Carica il file generato dal comando git relativo ai messaggi di errore ecc.
+		infile = open(NameFileOut, "r")
+		if infile:
+			string = infile.read()
+			infile.close()
+			textbuffer.set_text(string)
+		window.show()
 
-        # Carica il file generato dal comando git relativo ai messaggi di errore ecc.
-        #print NameFileOut
-        infile = open(NameFileOut, "r")
+#	def destroy(self, widget):
+#		return #gtk.main_quit()
+class Outwin_FTP():
+    def __init__(self, NameFileOut):
+			
+		window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		window.set_resizable(True)  
+#		window.connect("destroy", self.destroy)
+		window.set_title("Output dei comandi")
+		window.set_size_request(600, 460)		#dimensione della finestra per 4 button (100,180)
+		window.set_border_width(0)
+		window.modify_bg(gtk.STATE_NORMAL, giallo)    
 
-        if infile:
-            string = infile.read()
-            infile.close()
-            textbuffer.set_text(string)
+		box1 = gtk.VBox(False, 0)
+		window.add(box1)
+		box1.show()
+		box2 = gtk.VBox(False, 10)
+		box2.set_border_width(10)
+		box1.pack_start(box2, True, True, 0)
+		box2.show()
 
-        '''hbox = gtk.HButtonBox()
-        box2.pack_start(hbox, False, False, 0)
-        hbox.show()
+		sw = gtk.ScrolledWindow()
+		sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		textview = gtk.TextView()
+		textbuffer = textview.get_buffer()
+		sw.add(textview)
+		sw.show()
+		textview.show()
+		box2.pack_start(sw)
+		self.outwin_open = True
+		window.show()
 
-        vbox = gtk.VBox()
-        vbox.show()
-        hbox.pack_start(vbox, False, False, 0)
-        # check button to toggle editable mode
-        check = gtk.CheckButton("Editable")
-        vbox.pack_start(check, False, False, 0)
-        check.connect("toggled", self.toggle_editable, textview)
-        check.set_active(True)
-        check.show()
-        # check button to toggle cursor visiblity
-        check = gtk.CheckButton("Cursor Visible")
-        vbox.pack_start(check, False, False, 0)
-        check.connect("toggled", self.toggle_cursor_visible, textview)
-        check.set_active(True)
-        check.show()
-        # check button to toggle left margin
-        check = gtk.CheckButton("Left Margin")
-        vbox.pack_start(check, False, False, 0)
-        check.connect("toggled", self.toggle_left_margin, textview)
-        check.set_active(False)
-        check.show()
-        # check button to toggle right margin
-        check = gtk.CheckButton("Right Margin")
-        vbox.pack_start(check, False, False, 0)
-        check.connect("toggled", self.toggle_right_margin, textview)
-        check.set_active(False)
-        check.show()
-        # radio buttons to specify wrap mode
-        vbox = gtk.VBox()
-        vbox.show()
-        hbox.pack_start(vbox, False, False, 0)
-        radio = gtk.RadioButton(None, "WRAP__NONE")
-        vbox.pack_start(radio, False, True, 0)
-        radio.connect("toggled", self.new_wrap_mode, textview, gtk.WRAP_NONE)
-        radio.set_active(True)
-        radio.show()
-        radio = gtk.RadioButton(radio, "WRAP__CHAR")
-        vbox.pack_start(radio, False, True, 0)
-        radio.connect("toggled", self.new_wrap_mode, textview, gtk.WRAP_CHAR)
-        radio.show()
-        radio = gtk.RadioButton(radio, "WRAP__WORD")
-        vbox.pack_start(radio, False, True, 0)
-        radio.connect("toggled", self.new_wrap_mode, textview, gtk.WRAP_WORD)
-        radio.show()
+		# Carica il file generato dal comando git relativo ai messaggi di errore ecc.
+		infile = open(NameFileOut, "r")
+		if infile:
+			string = infile.read()
+			infile.close()
+			textbuffer.set_text(string)
 
-        # radio buttons to specify justification
-        vbox = gtk.VBox()
-        vbox.show()
-        hbox.pack_start(vbox, False, False, 0)
-        radio = gtk.RadioButton(None, "JUSTIFY__LEFT")
-        vbox.pack_start(radio, False, True, 0)
-        radio.connect("toggled", self.new_justification, textview,
-                      gtk.JUSTIFY_LEFT)
-        radio.set_active(True)
-        radio.show()
-        radio = gtk.RadioButton(radio, "JUSTIFY__RIGHT")
-        vbox.pack_start(radio, False, True, 0)
-        radio.connect("toggled", self.new_justification, textview,
-                      gtk.JUSTIFY_RIGHT)
-        radio.show()
-        radio = gtk.RadioButton(radio, "JUSTIFY__CENTER")
-        vbox.pack_start(radio, False, True, 0)
-        radio.connect("toggled", self.new_justification, textview,
-                      gtk.JUSTIFY_CENTER)
-        radio.show()
-
-        separator = gtk.HSeparator()
-        box1.pack_start(separator, False, True, 0)
-        separator.show()
-
-        box2 = gtk.VBox(False, 10)
-        box2.set_border_width(10)
-        box1.pack_start(box2, False, True, 0)
-        box2.show()
-
-#        button = gtk.Button("Chiudi")
-#        button.connect("clicked", self.destroy)
-#        box2.pack_start(button, True, True, 0)
-#        button.set_flags(gtk.CAN_DEFAULT)
-#        button.grab_default()
-#        button.show()'''
-        window.show()
-
-    '''def toggle_editable(self, checkbutton, textview):
-        textview.set_editable(checkbutton.get_active())
-
-    def toggle_cursor_visible(self, checkbutton, textview):
-        textview.set_cursor_visible(checkbutton.get_active())
-
-    def toggle_left_margin(self, checkbutton, textview):
-        if checkbutton.get_active():
-            textview.set_left_margin(50)
-        else:
-            textview.set_left_margin(0)
-
-    def toggle_right_margin(self, checkbutton, textview):
-        if checkbutton.get_active():
-            textview.set_right_margin(50)
-        else:
-            textview.set_right_margin(0)
-
-    def new_wrap_mode(self, radiobutton, textview, val):
-        if radiobutton.get_active():
-            textview.set_wrap_mode(val)
-
-    def new_justification(self, radiobutton, textview, val):
-        if radiobutton.get_active():
-            textview.set_justification(val)'''
-
-    def destroy(self, widget):
-        return #gtk.main_quit()
+#	def destroy(self, widget):
+#		return #gtk.main_quit()
 
 class Outwin_msg_FTP(): 
 	#Stato_server = stringa di welcome oppure stringa d'errore
