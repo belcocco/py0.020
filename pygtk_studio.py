@@ -62,17 +62,17 @@ clonetext = "git clone https://github.com/belcocco/py0.020.git &> clone.out"
 pushtext = "git push https://github.com/belcocco/py0.020.git master &> push.out"
 
 	#Testi vari per FTP
-txt_site_default = "localhost"
-txt_uname_default = "raga"
-txt_pswd_default = "ragamuz"
+#txt_site_default = "localhost"
+#txt_uname_default = "raga"
+#txt_pswd_default = "ragamuz"
 
 #txt_site_default = "ftp.twaren.net"
 #txt_uname_default = "anonymous"
 #txt_pswd_default = ""
 
-#txt_site_default = "na.mirror.garr.it"
-#txt_uname_default = "anonymous"
-#txt_pswd_default = ""
+txt_site_default = "na.mirror.garr.it"
+txt_uname_default = "anonymous"
+txt_pswd_default = ""
 
 #Nomi dei file interessati alle attività
 file_ftp_out = "comando_ftp.out"
@@ -91,7 +91,7 @@ class Help_FTP(object):
 	-Cambio directory locale	cd l /nome_da_aggiungere_al_path_di_ld
 	-Cambio directory remota	cd r /nome_da_aggiungere_al_path_di_rd
 	-Lista File					list
-	-Ricerca File				search nome_file
+	
 	-Rinomina File				ren nome_file dir nuovo_mome_file
 	-Elimina File				del nome_file dir
 	-Download file				dw dir_remota filename dir_locale_di_uscita(_che può essere omessa)
@@ -554,7 +554,8 @@ class GUI_ftp():
 		self.ftp.quit()
 		self.online = False
 		Errore_connessione = True
-		serverID = 1
+		server_ind = self.entry1.get_text()
+		serverID = 0
 		Stato_server = "Disconnessione effettuata"
 		Outwin_msg_FTP(Stato_server, Errore_connessione, server_ind, serverID)
 		print "Server disconnesso"
@@ -629,7 +630,9 @@ class GUI_ftp():
 		else:
 			self.online = False
 			Errore_connessione = True
-			Stato_server = "Disconnessione effettuata"  #[FATAL ERROR] Connessione fallita!"
+			server_ind = self.entry1.get_text()
+			serverID = 0
+			Stato_server = "Disconnessione effettuata dal server remoto"  #[FATAL ERROR] Connessione fallita!"
 			Outwin_msg_FTP(Stato_server, Errore_connessione, server_ind, serverID)
 			print 'Error, place non supportato!\nPlace supportati: R,L\nR = remote\nL = local'
 			return False
@@ -637,30 +640,26 @@ class GUI_ftp():
 	def search_file(self,filename,directory):		
 		"""Comando: Search        Parametri: filename, directory
 		Compito: Cerca un file"""
-		file1 = open("comando_ftp.out","a") 			#"a"=append
 		list_dir = []
 		self.change_directory('R',directory)
 
 		self.ftp.retrlines('NLST', list_dir.append)
-		list_dir.sort()		#metti la lista in ordine alfabetico 
-		_file=[x for x in list_dir if filename in x]
-		if _file == []:
-			fname = filename
-			msg_non_trovato = ('[!!]File %s non trovato!', filename)
-			file1.write(msg_non_trovato)
-			file1.write("---------------------------\n")
-			file1.write("\n")
-			print '[!!]File %s non trovato!', fname
-			return
+		file_da_cercare = [x for x in list_dir if filename in x]
+		if file_da_cercare != []:
+#			file1.write(msg_non_trovato)
+#			file1.write("---------------------------\n")
+#			file1.write("\n")
+			print file_da_cercare, '[OK] File trovato!'
+			return True
 		else:
-			msg_trovato = ('[OK] File %s trovato!', _file )
-			file1.write(msg_trovato)
-			file1.write("---------------------------\n")
-			file1.write("\n")
-			print _file
-			return
-		file1.close()
-		Outwin_FTP("comando_ftp.out")
+#			file_da_cercare = filename
+#			file_non_trovato = ('filename, '[Error!] File non trovato!')
+#			file1.write(msg_trovato)
+#			file1.write("---------------------------\n")
+#			file1.write("\n")
+			return False
+#		file1.close()
+#		Outwin_FTP("comando_ftp.out")
                         
                         
         
@@ -668,20 +667,31 @@ class GUI_ftp():
 		"""Comando: DW  Parametri: Directory(Directory  remota del file), filename(nome del file remoto), directory_uscita(Directory locale dove verrà salvato il file.
 		il valore predefinito è la directory corrente)
 		Compito: Scarica un file dal server"""
+		file1 = open("comando_ftp.out","a") 			#"a"=append
 		try:
 			if from_all_file:
 				file_remoto = open(filename,'wb')
 				self.ftp.retrbinary('RETR %s' %(str(filename)),file_remoto.write)
 				file_remoto.close()
+					file_remoto.close()
+					file1.write('[OK] File trovato e scaricato in: ')
+					file1.write(os.getcwd())
+					file1.write("\n")
 				print 'Scaricato in %s' %(os.getcwd())
 			else:
 				if self.search_file(filename,directory):
 					file_remoto = open(filename,'wb')
 					self.ftp.retrbinary('RETR %s' %(str(filename)),file_remoto.write)
 					file_remoto.close()
+					file1.write('[OK] File trovato e scaricato in: ')
+					file1.write(os.getcwd())
+					file1.write("\n")
 					print 'Scaricato in %s' %(os.getcwd())
 				else:
-					print '[!!]File %s non trovato!' %(filename)
+					file1.write('[Error!] File non trovato!')
+					file1.write("---------------------------\n")
+					file1.write("\n")
+					print '[Errore] File %s non trovato!' %(filename)
 		except ftplib.error_perm as e:
 			file_remoto.close()
 			print '[ERROR] %s' %(e) #Error 500-599
@@ -689,8 +699,10 @@ class GUI_ftp():
 			print 'Download interrotto'
 		except IOError as e:
 			print '[ERROR]%s' %(e)
-			print '[!!]Sintassi corretta del comando DW: DW directory_remoto file_remoto directory_uscita esempio: DW / favicon.ico C:\Users\normal_user\Desktop'
+			print '[!!]Sintassi corretta del comando DW: DW directory_remoto file_remoto directory_uscita'
 			print 'Per maggiori informazioni usare il comando HELP'
+		file1.close()
+		Outwin_FTP("comando_ftp.out")
                         
                     
 	def download_all_file(self,directory_remota,directory_uscita = os.getcwd()):
@@ -712,13 +724,14 @@ class GUI_ftp():
 		list_dir = []
 
 		self.ftp.retrlines('NLST', list_dir.append)
-		strg_dir = repr(len(list_dir))	#un numero intero (esempio 10) diventa Ascii (31h 30Hstringa)  
+		strg_dir = repr(len(list_dir))	#un numero intero (esempio 10) diventa Ascii (31h 30H)  
 #		print strg_dir
 		list_dir.sort()		#metti la lista in ordine alfabetico 
 		file1.write(strg_dir)
-		file1.write(" File'('s')' nella Directory remota\n")
+		file1.write(" Files nella Directory remota\n")
 		file1.write("---------------------------\n")
 		for x in list_dir:
+#if x[1]['type'] == 'file':
 			print x
 			file1.write(x)
 			file1.write("\n")
