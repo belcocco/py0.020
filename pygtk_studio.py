@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#Creato da: Belcocco
+#Creato da: belcocco
 #Data:24-10-2012
 #import module
 import pygtk, gtk
@@ -31,6 +31,7 @@ import string
 import shutil
 import tempfile
 import pango
+import random
 from subprocess import Popen, PIPE
 from threading import Thread
 from Queue import Queue, Empty
@@ -46,6 +47,8 @@ marine = gtk.gdk.color_parse('#0BC7B3')
 giallo = gtk.gdk.color_parse('#FFFF00')
 carota = gtk.gdk.color_parse('#FC9060')
 marine = gtk.gdk.color_parse('#2BC4E3')
+viola = gtk.gdk.color_parse('#9885ff')
+
 	#Pango
 fg_color = pango.AttrForeground(65565, 0, 0, 0, 6)
 underline = pango.AttrUnderline(pango.UNDERLINE_DOUBLE, 7, 11)
@@ -417,7 +420,7 @@ class GUI_ftp():
 	def __init__(self):
 		#Azzera il file di output dei comandi
 		file1 = open("comando_ftp.out","w") #"a"=append, "w"=sovrascrive, "r"=legge, "r+"=lettura e scrittura
-		file1.write("")
+		file1.write("   ")
 		file1.close()
 		outwin_ftp_close = False
 
@@ -494,14 +497,14 @@ class GUI_ftp():
 		self.button_exec_ftp_cmd.connect("clicked", self.exec_ftp_cmd)		#Aspetta il click del bottone Esegui per startare la connessione
 		self.vbox.pack_start(self.button_exec_ftp_cmd, gtk.TRUE, gtk.TRUE, 0)
 
-#Spazio per gestire una attività (RISERVA)
-#		self.entry5 = gtk.Entry(100)
-#		self.vbox.pack_start(self.entry5, gtk.TRUE, gtk.TRUE, 0)
-
-#Spazio per gestire una attività (RISERVA)
-#		self.entry6 = gtk.Entry(100)
-#		self.vbox.pack_start(self.entry6, gtk.TRUE, gtk.TRUE, 0)
-
+#Spazio di testo per gestire gli output dwi comandi
+		self.textview = gtk.TextView()
+		self.vbox.pack_start(self.textview, gtk.TRUE, gtk.TRUE, 0)
+		self.sw = gtk.ScrolledWindow()
+		self.sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		textbuffer = self.textview.get_buffer()
+		self.sw.add(self.textview)
+		self.sw.show()
 
 #Visualizza le varie stringe per la connessione al server (indirizzo del server, username e password)
 		self.entry1.set_text(txt_site_default)
@@ -629,10 +632,10 @@ class GUI_ftp():
 				print '[!ERRORE di SCRITTURA!]%s' %(e) 
 		else:
 			self.online = False
-			Errore_connessione = True
+			Errore_connessione = False
 			server_ind = self.entry1.get_text()
 			serverID = 0
-			Stato_server = "Disconnessione effettuata dal server remoto"  #[FATAL ERROR] Connessione fallita!"
+			Stato_server = "Errore di sintassi, place non supportato!\nPlace supportati: R,L\nR = remote\nL = local"  #[FATAL ERROR] Connessione fallita!"
 			Outwin_msg_FTP(Stato_server, Errore_connessione, server_ind, serverID)
 			print 'Error, place non supportato!\nPlace supportati: R,L\nR = remote\nL = local'
 			return False
@@ -673,10 +676,9 @@ class GUI_ftp():
 				file_remoto = open(filename,'wb')
 				self.ftp.retrbinary('RETR %s' %(str(filename)),file_remoto.write)
 				file_remoto.close()
-					file_remoto.close()
-					file1.write('[OK] File trovato e scaricato in: ')
-					file1.write(os.getcwd())
-					file1.write("\n")
+				file1.write('[OK] File trovato e scaricato in: ')
+				file1.write(os.getcwd())
+				file1.write("\n")
 				print 'Scaricato in %s' %(os.getcwd())
 			else:
 				if self.search_file(filename,directory):
@@ -931,6 +933,7 @@ class GUI_hack:
 		return gtk.FALSE
 	def destroy(self, widget, data=None):
 		return #gtk.main_quit()
+
 
 class GUI_foto:
     def __init__(self):
@@ -1325,23 +1328,23 @@ class Attvarwin:		#la classe principale contenete tutte le funzioni
 	gtk.stock_add([(gtk.STOCK_DIALOG_INFO, "Info", 0, 0, "")])   
 	self.but = gtk.Button(None, gtk.STOCK_DIALOG_INFO, True)
         self.but.connect("clicked", self.info)
-	self.button1 = gtk.Button("button...")		#definisce un altro bottone
+	self.button1 = gtk.Button("button...win1")		#definisce un altro bottone
         self.button1.connect("clicked", self.win1)		#assegna al bottone una funzione
-	self.button2 = gtk.Button("toggle,...")		#definisce un altro bottone
+	self.button2 = gtk.Button("toggle,...win2")		#definisce un altro bottone
         self.button2.connect("clicked", self.win2)		#assegna al bottone una funzione cosi per tutti i bottone fino al segno di commento
-	self.button3 = gtk.Button("label...")
+	self.button3 = gtk.Button("PROVA...win3")
         self.button3.connect("clicked", self.win3)
-	self.button4 = gtk.Button("entry...")
+	self.button4 = gtk.Button("entry...win4")
         self.button4.connect("clicked", self.win4)
-	self.button5 = gtk.Button("dialog...")
+	self.button5 = gtk.Button("dialog...win5")
         self.button5.connect("clicked", self.win5)
-	self.button6 = gtk.Button("tool...")
+	self.button6 = gtk.Button("tool...win6")
         self.button6.connect("clicked", self.win6)
-	self.button7 = gtk.Button("image...")
+	self.button7 = gtk.Button("image...win7")
         self.button7.connect("clicked", self.win7)
-	self.button8 = gtk.Button("look...")
+	self.button8 = gtk.Button("look...win8")
         self.button8.connect("clicked", self.win8)
-	self.button9 = gtk.Button("Text...")
+	self.button9 = gtk.Button("Text...win9")
         self.button9.connect("clicked", self.win9)
 
 #------------------------------------------------------------------
@@ -1535,7 +1538,7 @@ class Attvarwin:		#la classe principale contenete tutte le funzioni
 
     def win3(self, widget):					#funzione che apre la 3a finestra
         self.win3 = gtk.Window(gtk.WINDOW_TOPLEVEL)
-	self.win3.set_title("Label")
+	self.win3.set_title("PROVA")
 	vbox = gtk.VBox(False, 0)
 	hbox1 = gtk.HBox(True, 0)
 	hbox2 = gtk.HBox(True, 0)
@@ -1543,24 +1546,45 @@ class Attvarwin:		#la classe principale contenete tutte le funzioni
 	hbox4 = gtk.HBox(True, 0)
 	hbox5 = gtk.HBox(True, 0)
 	hbox6 = gtk.HBox(True, 0)
-	vbox11 = gtk.VBox(True, 0)
-	vbox12 = gtk.VBox(True, 0)
-	vbox21 = gtk.VBox(True, 0)
-	vbox22 = gtk.VBox(True, 0)
-	vbox31 = gtk.VBox(True, 0)
-	vbox32 = gtk.VBox(True, 0)
-	vbox41 = gtk.VBox(True, 0)
-	vbox42 = gtk.VBox(True, 0)
-	vbox51 = gtk.VBox(True, 0)
-	vbox52 = gtk.VBox(True, 0)
-	vbox61 = gtk.VBox(False, 0)
-	vbox62 = gtk.VBox(False, 0)
-	self.label1 = gtk.Label("Normale label contenente testo")
-	self.label1lab = gtk.Label("le label si richiamno con la funzione gtk.Label\n per andare a capo inserire nel testo /n con la \nslash al contratrio pero ovvi motivi")
-	self.label2 = gtk.Label("label dinamica cambia con l'esecuzione")
-        self.buttonlab2 = gtk.Button(None, gtk.STOCK_EXECUTE)
-        self.buttonlab2.connect("clicked", self.change_text)
-	self.label2lab = gtk.Label("label dinamica la label cambia testo con il comando\n self.nomelabel.set_text('testo')")
+	vbox11 = gtk.VBox(True, 0)		#riga 1 colonna 1
+	vbox12 = gtk.VBox(True, 0)		#riga 1 colonna 2
+	vbox21 = gtk.VBox(True, 0)		#riga 2 colonna 1
+	vbox22 = gtk.VBox(True, 0)		#riga 2 colonna 2
+	vbox31 = gtk.VBox(True, 0)		#riga 3 colonna 1
+	vbox32 = gtk.VBox(True, 0)		#riga 3 colonna 2
+#	vbox41 = gtk.VBox(True, 0)
+#	vbox42 = gtk.VBox(True, 0)
+#	vbox51 = gtk.VBox(True, 0)
+#	vbox52 = gtk.VBox(True, 0)
+#	vbox61 = gtk.VBox(False, 0)
+#	vbox62 = gtk.VBox(False, 0)
+#Prima RIGA (Colonna 1 e 2)
+#Label e spazio per controllare l'inserimento del comando indirizzo server
+	self.frame1 = gtk.Frame("")
+	self.labelcent1 = gtk.Label("Sito Server FTP")
+	attr = pango.AttrList()
+	attr.insert(fg_color)
+	attr.insert(size10000)
+	self.labelcent1.set_attributes(attr)
+	self.frame1.add(self.labelcent1)
+	vbox11.pack_start(self.frame1, gtk.TRUE, gtk.TRUE, 0)
+
+	self.entry1 = gtk.Entry(100)
+	vbox12.pack_start(self.entry1, gtk.TRUE, gtk.TRUE, 0)
+#SECONDA RIGA (Colonna 1 e 2)
+#Label e spazio per controllare l'inserimento del comando username
+	self.frame2 = gtk.Frame("")
+	self.labelcent2 = gtk.Label("Nome Utente")
+	attr = pango.AttrList()
+	attr.insert(fg_color)
+	attr.insert(size10000)
+	self.labelcent2.set_attributes(attr)
+	self.frame2.add(self.labelcent2)
+	vbox21.pack_start(self.frame1, gtk.TRUE, gtk.TRUE, 0)
+
+	self.entry2 = gtk.Entry(100)
+	vbox22.pack_start(self.entry1, gtk.TRUE, gtk.TRUE, 0)
+#TERZA RIGA
 	self.label3 = gtk.Label("label contenete<b><big> testo evidenziato</big></b>")
 	self.label3lab = gtk.Label("nelle label e possibile evidenziare del testo inserendo i tag\n <b><big>testo</big></b> bisogna inoltre\n inserire la funzione self.nomelabel.set_use_markup(True)")
     	self.label3.set_use_markup(True)
@@ -1577,38 +1601,47 @@ class Attvarwin:		#la classe principale contenete tutte le funzioni
 	self.framelab6 = gtk.Frame("frame")
 	self.framelab6.add(self.label6)
 	self.label6lab =gtk.Label("I frame sono contenitori che possono contenere oggetti per crare un frame \n bisogna creare la varibile con la funzione gtk.Frame('intestazione') e poi aggiungere \n al frame l'ogrtto come se fosse un windows")
-	vbox11.pack_start(self.label1, True, False, 10)
-	vbox12.pack_start(self.label1lab, True, False, 10)
-	vbox21.pack_start(self.label2, True, False)
-	vbox21.pack_start(self.buttonlab2, True, False)
-	vbox22.pack_start(self.label2lab, True, False, 10)
-	vbox31.pack_start(self.label3, True, False, 10)
-	vbox32.pack_start(self.label3lab, True, False, 10)
-	vbox41.pack_start(self.label4, True, False, 10)
-	vbox42.pack_start(self.label4lab, True,  False, 10)
-	vbox51.pack_start(self.label5, True, True)
-	vbox51.pack_start(self.chechkk5, True, True)
-	vbox52.pack_start(self.label5lab, True, False, 10)
-	vbox61.pack_start(self.framelab6, True, True, 10)
-	vbox62.pack_start(self.label6lab, True, True, 10)
+
+#	vbox11.pack_start(self.label1, True, False, 10)
+#	vbox12.pack_start(self.label1lab, True, False, 10)
+
+#	vbox21.pack_start(self.label2, True, False)
+#	vbox21.pack_start(self.buttonlab2, True, False)
+#	vbox22.pack_start(self.label2lab, True, False, 10)
+#	vbox21.pack_start(self.frame1, gtk.TRUE, gtk.TRUE, 0)
+#	vbox22.pack_start(self.entry1, gtk.TRUE, gtk.TRUE, 0)
+
+#	vbox31.pack_start(self.label3, True, False, 10)
+#	vbox32.pack_start(self.label3lab, True, False, 10)
+#	vbox41.pack_start(self.label4, True, False, 10)
+#	vbox42.pack_start(self.label4lab, True,  False, 10)
+#	vbox51.pack_start(self.label5, True, True)
+#	vbox51.pack_start(self.chechkk5, True, True)
+#	vbox52.pack_start(self.label5lab, True, False, 10)
+#	vbox61.pack_start(self.framelab6, True, True, 10)
+#	vbox62.pack_start(self.label6lab, True, True, 10)
+
 	hbox1.pack_start(vbox11, True, True, 10)
 	hbox1.pack_start(vbox12, True, True, 10)
 	hbox2.pack_start(vbox21, True, True, 10)
 	hbox2.pack_start(vbox22, True, True, 10)
-	hbox3.pack_start(vbox31, True, True, 10)
-	hbox3.pack_start(vbox32, True, True, 10)
-	hbox4.pack_start(vbox41, True, True, 10)
-	hbox4.pack_start(vbox42, True, True, 10)
-	hbox5.pack_start(vbox51, True, True, 10)
-	hbox5.pack_start(vbox52, True, True, 10)
-	hbox6.pack_start(vbox61, True, True, 10)
-	hbox6.pack_start(vbox62, True, True, 10)
+#	hbox3.pack_start(vbox31, True, True, 10)
+#	hbox3.pack_start(vbox32, True, True, 10)
+#	hbox4.pack_start(vbox41, True, True, 10)
+#	hbox4.pack_start(vbox42, True, True, 10)
+#	hbox5.pack_start(vbox51, True, True, 10)
+#	hbox5.pack_start(vbox52, True, True, 10)
+#	hbox6.pack_start(vbox61, True, True, 10)
+#	hbox6.pack_start(vbox62, True, True, 10)
+
 	vbox.pack_start(hbox1, False, False)
 	vbox.pack_start(hbox2, False, False)
 	vbox.pack_start(hbox3, False, False)
 	vbox.pack_start(hbox4, False, False)
 	vbox.pack_start(hbox5, False, False)
 	vbox.pack_start(hbox6, False, False)
+
+
 	self.win3.add(vbox)
 	self.win3.show_all()
 	
@@ -1806,7 +1839,7 @@ class Attvarwin:		#la classe principale contenete tutte le funzioni
     def immwinn(self, widget):				#funzione contenente la finestra con immagine utilizzata usata in win7 e
 	self.immwin  = gtk.Window(gtk.WINDOW_TOPLEVEL)
         img = gtk.Image()
-        img.set_from_file('024_1.jpg')
+        img.set_from_file('Raga-auto67x50.png')
         self.immwin.add(img)
         self.immwin.show_all()
 
@@ -1864,7 +1897,7 @@ class Attvarwin:		#la classe principale contenete tutte le funzioni
     def lookwin(self, widget):				#funzione contenetela finestra aperta con il bottone in win8 
 	self.winlook = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.winlook.set_title('background')
-        color = gtk.gdk.color_parse('#7885ff')    
+        color = giallo   
         self.winlook.modify_bg(gtk.STATE_NORMAL, color)    
         self.winlook.show()
 
@@ -1971,5 +2004,7 @@ startMainWin.show_all()
 #                command = raw_input('pyFTP >>> ')
 #                obj.controlla_cmd(command)      
 #################################################
-
+#if __name__ == "__main__":
+#    tmsexample = TreeModelSortExample()
+#    main()
 gtk.main()
